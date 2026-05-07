@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chess-explainer-config
+  namespace: chess-explainer
+data:
+  PORT: "8000"

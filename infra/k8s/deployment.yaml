@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chess-explainer
+  namespace: chess-explainer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chess-explainer
+  template:
+    metadata:
+      labels:
+        app: chess-explainer
+    spec:
+      containers:
+        - name: web
+          image: 123456789012.dkr.ecr.eu-west-3.amazonaws.com/chess-explainer:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: chess-explainer-config
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

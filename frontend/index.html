@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Study</title>
+    <link rel="stylesheet" href="/styles.css?v=20260402" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <div class="brand-lockup">
+            <img src="/logo.svg?v=20260402" alt="Chess Study logo" class="brand-logo" />
+            <div>
+              <p class="eyebrow">Chess Study</p>
+              <h1>Build your own study</h1>
+            </div>
+          </div>
+          <p class="muted">Engine, opening context, Wikibooks, notes, annotations, and your own training memory in one place.</p>
+        </div>
+
+        <section class="sidebar-section auth-card">
+          <div class="section-head">
+            <p class="eyebrow">Account</p>
+            <p id="authSummary" class="muted compact">Guest mode</p>
+          </div>
+          <p id="authStatus" class="section-copy compact">Sign in to keep a personal library of studies.</p>
+          <div id="authGuestFields" class="auth-fields">
+            <label class="field-label" for="authNameInput">Display name</label>
+            <input id="authNameInput" class="text-input" type="text" placeholder="Your name" />
+            <label class="field-label" for="authEmailInput">Email</label>
+            <input id="authEmailInput" class="text-input" type="email" placeholder="you@example.com" />
+            <label class="field-label" for="authPasswordInput">Password</label>
+            <input id="authPasswordInput" class="text-input" type="password" placeholder="At least 8 characters" />
+            <div class="sidebar-actions auth-actions">
+              <button id="loginButton" class="primary-button" type="button">Sign in</button>
+              <button id="registerButton" class="ghost-button" type="button">Create account</button>
+            </div>
+          </div>
+          <div id="authUserPanel" class="auth-user-panel hidden">
+            <p id="authUserName" class="user-name"></p>
+            <p id="authUserEmail" class="muted compact"></p>
+            <button id="logoutButton" class="ghost-button" type="button">Sign out</button>
+          </div>
+        </section>
+
+        <div class="sidebar-actions">
+          <button id="newStudyButton" class="primary-button" type="button">New study</button>
+          <button id="saveStudyButton" class="ghost-button" type="button">Save</button>
+        </div>
+
+        <label class="field-label" for="studyTitle">Study title</label>
+        <input id="studyTitle" class="text-input" type="text" placeholder="My opening study" />
+        <p id="saveStatus" class="muted compact">No study loaded yet.</p>
+
+        <section class="sidebar-section">
+          <div class="section-head">
+            <p class="eyebrow">Saved studies</p>
+          </div>
+          <div id="studiesList" class="study-list"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <section class="board-column">
+          <div class="toolbar-card">
+            <div class="toolbar-row">
+              <div class="tool-group">
+                <button id="modeMove" class="tool-button active" type="button">Move</button>
+                <button id="modeArrow" class="tool-button" type="button">Arrow</button>
+                <button id="modeHighlight" class="tool-button" type="button">Highlight</button>
+              </div>
+              <div class="tool-group">
+                <button data-color="#4f46e5" class="color-button active" type="button"></button>
+                <button data-color="#e11d48" class="color-button" type="button"></button>
+                <button data-color="#0f766e" class="color-button" type="button"></button>
+                <button data-color="#f59e0b" class="color-button" type="button"></button>
+              </div>
+              <div class="tool-group">
+                <button id="undoButton" class="ghost-button" type="button">Undo</button>
+                <button id="redoButton" class="ghost-button" type="button">Redo</button>
+                <button id="clearAnnotationsButton" class="ghost-button" type="button">Clear marks</button>
+                <button id="flipButton" class="ghost-button" type="button">Flip</button>
+              </div>
+            </div>
+            <p class="annotation-help">
+              Right click one square to highlight it. Right drag to draw or remove an arrow. Hold <kbd>Shift</kbd>, <kbd>Alt</kbd>, or <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> for another color, or press <kbd>1</kbd>-<kbd>4</kbd>.
+            </p>
+            <div class="status-row">
+              <p id="status" class="status-line">Create or open a study to begin.</p>
+              <div id="analysisLoading" class="loading-chip hidden" aria-live="polite">
+                <img src="/logo.svg?v=20260402" alt="" class="loading-logo" />
+                <span id="analysisLoadingText">Analyzing move...</span>
+              </div>
+            </div>
+          </div>
+
+          <section class="board-card">
+            <div class="eval-head">
+              <div>
+                <p class="eyebrow">Engine verdict</p>
+                <h2 id="qualityLabel">No engine</h2>
+              </div>
+              <span id="qualityBadge" class="quality-badge quality-neutral">Pending</span>
+            </div>
+            <div class="eval-bar-shell" aria-label="Engine evaluation bar">
+              <div id="evalBarWhite" class="eval-bar-white"></div>
+              <div id="evalBarBlack" class="eval-bar-black"></div>
+            </div>
+            <p id="evalSummary" class="muted compact">
+              Install Stockfish and configure `STOCKFISH_PATH` to unlock engine judgement.
+            </p>
+
+            <div id="boardContainer" class="board-container">
+              <div id="board" class="board" aria-label="Interactive chessboard"></div>
+              <div id="highlightLayer" class="highlight-layer"></div>
+              <svg id="arrowLayer" class="arrow-layer" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <polygon points="0 0, 6 3, 0 6"></polygon>
+                  </marker>
+                </defs>
+              </svg>
+            </div>
+
+            <div class="board-footer">
+              <span id="turnBadge" class="badge">Turn: white</span>
+              <span id="modeHint" class="muted compact">Move mode lets you play moves on the board.</span>
+            </div>
+          </section>
+
+          <section class="move-list-card">
+            <div class="section-head">
+              <p class="eyebrow">Move list</p>
+              <p class="muted compact">Click any move to review that position.</p>
+            </div>
+            <div id="moveList" class="move-list"></div>
+          </section>
+        </section>
+
+        <section class="analysis-column">
+          <section class="analysis-card">
+            <p class="eyebrow">Opening</p>
+            <h2 id="openingName">Opening not identified yet</h2>
+            <p id="openingMeta" class="muted compact">Play a few moves to detect the opening.</p>
+            <div class="study-section">
+              <h3>Overview</h3>
+              <p id="openingSummary" class="section-copy">
+                Wikibooks and opening context will appear here when available.
+              </p>
+            </div>
+            <div class="study-section">
+              <h3>Key themes</h3>
+              <ul id="openingIdeasList" class="bullets">
+                <li>The opening themes will appear here.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Typical replies</h3>
+              <div id="openingResponses" class="tag-list"></div>
+            </div>
+            <div class="study-section">
+              <h3>How to study this position</h3>
+              <ul id="studyChecklistList" class="bullets">
+                <li>Play a move to generate a study checklist.</li>
+              </ul>
+            </div>
+            <p id="openingLinkWrap" class="compact"></p>
+          </section>
+
+          <section class="analysis-card">
+            <p class="eyebrow">Assessment</p>
+            <h2 id="headline">Waiting for a move</h2>
+            <p id="engineLine" class="section-copy">
+              The move assessment will explain whether the move is good, inaccurate, a mistake, a blunder, or an interesting idea.
+            </p>
+            <div class="study-section">
+              <h3>What happened</h3>
+              <ul id="whatHappenedList" class="bullets">
+                <li>Play a move to generate a structured explanation.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Key ideas to remember</h3>
+              <ul id="keyIdeasList" class="bullets">
+                <li>The app will highlight the main ideas to keep in mind.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Watch out</h3>
+              <ul id="watchOutList" class="bullets">
+                <li>The app will point out tactical or strategic warnings here.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Full notes</h3>
+              <ul id="bullets" class="bullets">
+                <li>Play a move to generate a structured explanation.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="analysis-card">
+            <p class="eyebrow">Likely next moves</p>
+            <h2>Candidate continuations</h2>
+            <div id="candidateMoves" class="candidate-list"></div>
+          </section>
+
+          <section class="analysis-card">
+            <p class="eyebrow">AI coach</p>
+            <h2 id="aiHeadline">AI study coach</h2>
+            <p id="aiStatusLine" class="muted compact">
+              AI status will appear here.
+            </p>
+            <div class="study-section">
+              <h3>Verdict</h3>
+              <p id="aiSummary" class="section-copy">
+                Add an OpenAI API key if you want a natural-language coaching summary.
+              </p>
+            </div>
+            <div class="study-section">
+              <h3>Best plan</h3>
+              <ul id="aiPlanList" class="bullets">
+                <li>The AI plan will appear here.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Typical mistake to avoid</h3>
+              <ul id="aiMistakeList" class="bullets">
+                <li>The AI warning will appear here.</li>
+              </ul>
+            </div>
+            <div class="study-section">
+              <h3>Training takeaway</h3>
+              <ul id="aiTakeawayList" class="bullets">
+                <li>The AI takeaway will appear here.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="analysis-card">
+            <p class="eyebrow">Study notes</p>
+            <label class="field-label" for="commentInput">Your comment</label>
+            <textarea id="commentInput" class="textarea" placeholder="Write what you noticed in this position..."></textarea>
+            <label class="field-label" for="customExplanationInput">Your edited explanation</label>
+            <textarea
+              id="customExplanationInput"
+              class="textarea"
+              placeholder="Rewrite the explanation in your own words..."
+            ></textarea>
+          </section>
+
+          <section class="analysis-card">
+            <div class="section-head">
+              <p class="eyebrow">Editable study text</p>
+              <div class="tool-group">
+                <button id="applyTextEditsButton" class="ghost-button" type="button">Apply text edits</button>
+                <button id="resetTextEditsButton" class="ghost-button" type="button">Reset text</button>
+              </div>
+            </div>
+            <label class="field-label" for="editOpeningNameInput">Opening title</label>
+            <input id="editOpeningNameInput" class="text-input" type="text" placeholder="Opening title" />
+            <label class="field-label" for="editOpeningSummaryInput">Opening overview</label>
+            <textarea id="editOpeningSummaryInput" class="textarea" placeholder="Organize the opening overview..."></textarea>
+            <label class="field-label" for="editOpeningResponsesInput">Typical replies</label>
+            <textarea id="editOpeningResponsesInput" class="textarea compact-textarea" placeholder="One line per typical reply..."></textarea>
+            <label class="field-label" for="editHeadlineInput">Assessment headline</label>
+            <input id="editHeadlineInput" class="text-input" type="text" placeholder="Headline" />
+            <label class="field-label" for="editEngineLineInput">Engine line</label>
+            <textarea id="editEngineLineInput" class="textarea compact-textarea" placeholder="Engine verdict summary..."></textarea>
+            <label class="field-label" for="editWhatHappenedInput">What happened</label>
+            <textarea id="editWhatHappenedInput" class="textarea" placeholder="One line per point..."></textarea>
+            <label class="field-label" for="editKeyIdeasInput">Key ideas</label>
+            <textarea id="editKeyIdeasInput" class="textarea" placeholder="One line per point..."></textarea>
+            <label class="field-label" for="editWatchOutInput">Watch out</label>
+            <textarea id="editWatchOutInput" class="textarea" placeholder="One line per warning..."></textarea>
+            <label class="field-label" for="editBulletsInput">Full notes</label>
+            <textarea id="editBulletsInput" class="textarea" placeholder="One line per note..."></textarea>
+            <label class="field-label" for="editAiVerdictInput">Coach verdict</label>
+            <textarea id="editAiVerdictInput" class="textarea compact-textarea" placeholder="Rewrite the verdict..."></textarea>
+            <label class="field-label" for="editAiPlanInput">Best plan</label>
+            <textarea id="editAiPlanInput" class="textarea compact-textarea" placeholder="Rewrite the best plan..."></textarea>
+            <label class="field-label" for="editAiMistakeInput">Typical mistake</label>
+            <textarea id="editAiMistakeInput" class="textarea compact-textarea" placeholder="Rewrite the warning..."></textarea>
+            <label class="field-label" for="editAiTakeawayInput">Training takeaway</label>
+            <textarea id="editAiTakeawayInput" class="textarea compact-textarea" placeholder="Rewrite the takeaway..."></textarea>
+          </section>
+
+          <section class="analysis-card">
+            <p class="eyebrow">Position</p>
+            <pre id="fenBox" class="fen-box"></pre>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js?v=20260402" defer></script>
+  </body>
+</html>
