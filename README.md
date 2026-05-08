@@ -54,6 +54,7 @@ It will not work with `APE_KEY`.
 3. [03-learning-path.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/03-learning-path.md)
 4. [04-engine-analysis.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/04-engine-analysis.md)
 5. [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
+6. [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
 
 ## Deploy on AWS
 
@@ -67,6 +68,14 @@ Use:
 - [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
 
 This is much cheaper and simpler than Amazon EKS for a first public demo.
+
+## Kubernetes demo path
+
+If you want a real Kubernetes demo without Amazon EKS cost, use:
+
+- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/k3s/bootstrap-ubuntu.sh)
+- [deploy-k3s.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/k3s/deploy-k3s.sh)
+- [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
 
 ## GitHub workflow
 
