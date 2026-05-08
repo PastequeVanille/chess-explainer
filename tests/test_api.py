@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from uuid import uuid4
 
+from backend.app import main as main_module
 from backend.app.main import app
 
 
@@ -44,6 +45,8 @@ def test_explain_move_endpoint() -> None:
     assert payload["headline"] == "Pawn played e4"
     assert "move_quality" in payload
     assert "opening" in payload
+    assert "study_phase" in payload
+    assert "game_status" in payload
     assert "what_happened" in payload
     assert "key_ideas" in payload
     assert "watch_out" in payload
@@ -96,12 +99,71 @@ def test_study_endpoints_round_trip() -> None:
     assert fetched["analysis_cache_by_ply"]["2"]["headline"] == "Edited headline"
 
 
+def test_study_markdown_export_endpoint() -> None:
+    created = client.post("/api/studies", json={"title": "Export Study"}).json()
+    client.put(
+        f"/api/studies/{created['id']}",
+        json={
+            "title": "Export Study",
+            "move_history_uci": ["e2e4", "e7e5"],
+            "current_ply": 2,
+            "flipped": False,
+            "notes_by_ply": {"2": {"comment": "Study note", "custom_explanation": ""}},
+            "annotations_by_ply": {},
+            "analysis_cache_by_ply": {"2": {"headline": "Open game position", "key_ideas": ["Fight for the centre"]}},
+        },
+    )
+
+    response = client.get(f"/api/studies/{created['id']}/export.md")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/markdown")
+    assert "# Export Study" in response.text
+    assert "Fight for the centre" in response.text
+
+
+def test_engine_move_endpoint(monkeypatch) -> None:
+    monkeypatch.setattr(
+        main_module,
+        "compute_engine_move",
+        lambda fen, move_history_uci=None: {
+            "uci": "e7e5",
+            "san": "e5",
+            "fen_after": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+            "turn": "white",
+            "move_number": 2,
+            "game_status": {
+                "key": "in_progress",
+                "label": "In progress",
+                "summary": "The game is still in progress.",
+                "is_check": False,
+                "is_checkmate": False,
+                "is_game_over": False,
+                "result": None,
+                "winner": None,
+            },
+        },
+    )
+
+    response = client.post(
+        "/api/engine-move",
+        json={
+            "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+            "move_history_uci": ["e2e4"],
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["uci"] == "e7e5"
+
+
 def test_fen_history_endpoint_accepts_query_params() -> None:
     response = client.get("/api/fen-history", params=[("move_history_uci", "e2e4")])
     assert response.status_code == 200
-    history = response.json()["history"]
+    payload = response.json()
+    history = payload["history"]
     assert history[0].startswith("rnbqkbnr/pppppppp/")
     assert len(history) == 2
+    assert payload["san_history"] == ["e4"]
+    assert payload["statuses"][-1]["key"] == "in_progress"
 
 
 def test_auth_register_login_and_me() -> None:

@@ -44,6 +44,13 @@ class EngineMoveAnalysis:
     candidate_moves: list[EngineCandidateMove]
 
 
+@dataclass(frozen=True)
+class EngineReply:
+    uci: str
+    san: str
+    fen_after: str
+
+
 def analyse_move_with_engine(
     engine: chess.engine.SimpleEngine,
     board_before: chess.Board,
@@ -99,6 +106,25 @@ def analyse_move_with_engine(
         evaluation_bar_white_pct=_white_bar_percentage(after_score_cp),
         is_interesting=is_interesting,
         candidate_moves=_extract_candidate_moves(board_after, next_moves),
+    )
+
+
+def choose_engine_reply(
+    engine: chess.engine.SimpleEngine,
+    board: chess.Board,
+) -> EngineReply:
+    result = engine.play(board, chess.engine.Limit(time=0.18))
+    move = result.move
+    if move is None:
+        raise chess.engine.EngineError("Engine did not return a move")
+
+    san = board.san(move)
+    board_after = board.copy(stack=True)
+    board_after.push(move)
+    return EngineReply(
+        uci=move.uci(),
+        san=san,
+        fen_after=board_after.fen(),
     )
 
 

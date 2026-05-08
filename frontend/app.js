@@ -3,14 +3,18 @@ const boardContainerElement = document.getElementById("boardContainer");
 const highlightLayerElement = document.getElementById("highlightLayer");
 const arrowLayerElement = document.getElementById("arrowLayer");
 const statusElement = document.getElementById("status");
+const analysisColumnElement = document.getElementById("analysisColumn");
 const qualityLabelElement = document.getElementById("qualityLabel");
 const qualityBadgeElement = document.getElementById("qualityBadge");
 const evalSummaryElement = document.getElementById("evalSummary");
 const evalBarWhiteElement = document.getElementById("evalBarWhite");
 const evalBarBlackElement = document.getElementById("evalBarBlack");
+const gameStatusBadgeElement = document.getElementById("gameStatusBadge");
+const gameStatusSummaryElement = document.getElementById("gameStatusSummary");
 const turnBadgeElement = document.getElementById("turnBadge");
 const modeHintElement = document.getElementById("modeHint");
 const moveListElement = document.getElementById("moveList");
+const phaseEyebrowElement = document.getElementById("phaseEyebrow");
 const openingNameElement = document.getElementById("openingName");
 const openingMetaElement = document.getElementById("openingMeta");
 const openingSummaryElement = document.getElementById("openingSummary");
@@ -18,6 +22,11 @@ const openingIdeasListElement = document.getElementById("openingIdeasList");
 const openingResponsesElement = document.getElementById("openingResponses");
 const openingLinkWrapElement = document.getElementById("openingLinkWrap");
 const studyChecklistListElement = document.getElementById("studyChecklistList");
+const phaseOverviewHeadingElement = document.getElementById("phaseOverviewHeading");
+const phaseIdeasHeadingElement = document.getElementById("phaseIdeasHeading");
+const phaseContinuationsHeadingElement = document.getElementById("phaseContinuationsHeading");
+const phaseChecklistHeadingElement = document.getElementById("phaseChecklistHeading");
+const phaseContinuationsSectionElement = document.getElementById("phaseContinuationsSection");
 const headlineElement = document.getElementById("headline");
 const engineLineElement = document.getElementById("engineLine");
 const whatHappenedListElement = document.getElementById("whatHappenedList");
@@ -68,10 +77,21 @@ const commentInputElement = document.getElementById("commentInput");
 const customExplanationInputElement = document.getElementById("customExplanationInput");
 const newStudyButton = document.getElementById("newStudyButton");
 const saveStudyButton = document.getElementById("saveStudyButton");
+const exportMarkdownButton = document.getElementById("exportMarkdownButton");
+const exportJsonButton = document.getElementById("exportJsonButton");
+const promotionModalElement = document.getElementById("promotionModal");
+const promotionButtons = Array.from(document.querySelectorAll(".promotion-button"));
 const undoButton = document.getElementById("undoButton");
 const redoButton = document.getElementById("redoButton");
 const clearAnnotationsButton = document.getElementById("clearAnnotationsButton");
 const flipButton = document.getElementById("flipButton");
+const workspaceSummaryElement = document.getElementById("workspaceSummary");
+const coachToggleElement = document.getElementById("coachToggle");
+const workspaceModeButtons = {
+  study: document.getElementById("workspaceModeStudy"),
+  play: document.getElementById("workspaceModePlay"),
+  computer: document.getElementById("workspaceModeComputer"),
+};
 const modeButtons = {
   move: document.getElementById("modeMove"),
   arrow: document.getElementById("modeArrow"),
@@ -101,12 +121,20 @@ const MODE_HINTS = {
   highlight: "Highlight mode is useful on touch devices. On desktop, right click is the fastest way to mark a square.",
 };
 
+const WORKSPACE_SUMMARIES = {
+  study: "Study mode keeps the full explanation visible while you build notes.",
+  play: "Play mode hides the study panels so you can focus on the game.",
+  computer: "Vs computer lets you play against Stockfish. Turn coach help on or off whenever you want.",
+};
+
 let state = {
   studyId: null,
   studies: [],
   title: "Untitled Study",
   moveHistoryUci: [],
+  sanMoveHistory: [],
   fenHistory: [],
+  positionStatuses: [],
   currentPly: 0,
   flipped: false,
   selectedSquare: null,
@@ -129,6 +157,10 @@ let state = {
   authUser: null,
   analysisLoading: false,
   analysisRequestId: 0,
+  workspaceMode: "study",
+  coachEnabled: true,
+  computerThinking: false,
+  promotionResolver: null,
 };
 
 function setStatus(message) {
@@ -137,6 +169,20 @@ function setStatus(message) {
 
 function setSaveStatus(message) {
   saveStatusElement.textContent = message;
+}
+
+function analysisEnabled() {
+  if (state.workspaceMode === "study") {
+    return true;
+  }
+  if (state.workspaceMode === "computer") {
+    return state.coachEnabled;
+  }
+  return false;
+}
+
+function computerModeEnabled() {
+  return state.workspaceMode === "computer";
 }
 
 function renderList(element, items, emptyMessage) {
@@ -182,8 +228,33 @@ function cacheAnalysisForCurrentPly(result) {
   state.analysisCacheByPly[currentAnalysisCacheKey()] = JSON.parse(JSON.stringify(result));
 }
 
+function afterNextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
+    });
+  });
+}
+
 function currentFen() {
   return state.fenHistory[state.currentPly] || state.fenHistory[0] || "";
+}
+
+function currentPositionStatus() {
+  return state.positionStatuses[state.currentPly] || {
+    key: "in_progress",
+    label: "In progress",
+    summary: "The game is still in progress.",
+    is_check: false,
+    is_checkmate: false,
+    is_game_over: false,
+    result: null,
+    winner: null,
+  };
+}
+
+function currentPieces() {
+  return parseFenBoard(currentFen());
 }
 
 function currentTurnCode() {
@@ -235,6 +306,31 @@ function pieceColor(piece) {
   return piece === piece.toUpperCase() ? "w" : "b";
 }
 
+function promotionNeeded(fromSquare, toSquare) {
+  const piece = currentPieces()[fromSquare];
+  if (!piece || piece.toLowerCase() !== "p") {
+    return false;
+  }
+  const destinationRank = toSquare[1];
+  return destinationRank === "8" || destinationRank === "1";
+}
+
+function promptPromotionChoice() {
+  promotionModalElement.classList.remove("hidden");
+  return new Promise((resolve) => {
+    state.promotionResolver = resolve;
+  });
+}
+
+function resolvePromotionChoice(piece) {
+  promotionModalElement.classList.add("hidden");
+  const resolver = state.promotionResolver;
+  state.promotionResolver = null;
+  if (resolver) {
+    resolver(piece);
+  }
+}
+
 function fetchJson(url, options = {}) {
   return fetch(url, options).then(async (response) => {
     if (!response.ok) {
@@ -246,17 +342,12 @@ function fetchJson(url, options = {}) {
 }
 
 async function rebuildFenHistory() {
-  if (state.moveHistoryUci.length === 0) {
-    const game = await fetchJson("/api/game");
-    state.fenHistory = [game.fen];
-    state.currentPly = 0;
-    return;
-  }
-
   const params = new URLSearchParams();
   state.moveHistoryUci.forEach((move) => params.append("move_history_uci", move));
   const response = await fetchJson(`/api/fen-history?${params.toString()}`);
   state.fenHistory = response.history;
+  state.sanMoveHistory = response.san_history || [];
+  state.positionStatuses = response.statuses || [];
   if (state.currentPly > state.moveHistoryUci.length) {
     state.currentPly = state.moveHistoryUci.length;
   }
@@ -305,7 +396,7 @@ function renderMoveList() {
     if (state.currentPly === whitePly) {
       whiteButton.classList.add("active");
     }
-    whiteButton.textContent = `${Math.floor(index / 2) + 1}. ${state.moveHistoryUci[index]}`;
+    whiteButton.textContent = `${Math.floor(index / 2) + 1}. ${state.sanMoveHistory[index] || state.moveHistoryUci[index]}`;
     whiteButton.addEventListener("click", () => jumpToPly(whitePly));
     row.appendChild(whiteButton);
 
@@ -316,7 +407,7 @@ function renderMoveList() {
       if (state.currentPly === blackPly) {
         blackButton.classList.add("active");
       }
-      blackButton.textContent = state.moveHistoryUci[index + 1];
+      blackButton.textContent = state.sanMoveHistory[index + 1] || state.moveHistoryUci[index + 1];
       blackButton.addEventListener("click", () => jumpToPly(blackPly));
       row.appendChild(blackButton);
     }
@@ -325,9 +416,42 @@ function renderMoveList() {
   }
 }
 
-function openingThemeBullets(opening, result) {
-  const bullets = [];
-  const summary = opening?.summary || "";
+function studyPhaseData(result) {
+  if (result?.study_phase?.key) {
+    return result.study_phase;
+  }
+
+  if (result?.opening?.name) {
+    return {
+      key: "opening",
+      label: "Opening",
+      title: result.opening.name,
+      meta: "Wikibooks and opening references are available for this line.",
+      summary: result.opening.summary || "Opening context will appear here when available.",
+      ideas: [],
+      continuations_label: "Typical replies",
+      source_label: "Wikibooks opening reference",
+    };
+  }
+
+  return {
+    key: "middlegame",
+    label: "Middlegame",
+    title: "Middlegame study",
+    meta: "No opening reference applies here. Focus on plans and imbalances.",
+    summary:
+      "The opening phase is over. Study plans, pawn breaks, king safety, piece activity, and tactical motifs instead of looking for a memorized line.",
+    ideas: [],
+    continuations_label: "Plans to compare",
+    source_label: null,
+  };
+}
+
+function openingThemeBullets(result) {
+  const phase = studyPhaseData(result);
+  const opening = result?.opening;
+  const bullets = [...(phase.ideas || [])];
+  const summary = opening?.summary || phase?.summary || "";
   const summarySentences = summary
     .split(/(?<=[.!?])\s+/)
     .map((item) => item.trim())
@@ -339,7 +463,8 @@ function openingThemeBullets(opening, result) {
       .slice(0, 3)
       .map((candidate) => candidate.san)
       .join(", ");
-    bullets.push(`Common practical continuations to compare: ${candidateLine}.`);
+    const label = phase.key === "opening" ? "Common practical continuations to compare" : phase.continuations_label;
+    bullets.push(`${label}: ${candidateLine}.`);
   }
 
   if (result?.move_quality_summary) {
@@ -350,24 +475,31 @@ function openingThemeBullets(opening, result) {
 }
 
 function buildStudyChecklist(result) {
+  const phase = studyPhaseData(result);
   const openingName = result?.opening?.name;
   const candidateMoves = (result?.candidate_moves || []).slice(0, 3).map((candidate) => candidate.san);
   const checklist = [];
 
-  if (openingName) {
+  if (phase.key === "opening" && openingName) {
     checklist.push(`Opening: know the purpose of the ${openingName}, not only the move order.`);
+    checklist.push("Opening: tie each move to development, central control, and king safety.");
+    checklist.push("Opening: note the pawn structure you are aiming for once theory ends.");
+  } else if (phase.key === "endgame") {
+    checklist.push("Endgame: centralize the king and count pawn races before making exchanges.");
+    checklist.push("Endgame: identify passed pawns, outside majorities, and key squares.");
+    checklist.push("Endgame: ask whether trading pieces helps your winning or drawing chances.");
   } else {
     checklist.push("Opening: identify what the move changes in development, centre, and king safety.");
+    checklist.push("Middlegame: identify the pawn breaks and long-term plans for both sides.");
+    checklist.push("Middlegame: improve the worst-placed piece before forcing play.");
   }
-
-  checklist.push("Middlegame: note the pawn structure and the pawn breaks each side is aiming for.");
-  checklist.push("Middlegame: collect one or two tactical motifs that usually appear from this setup.");
+  checklist.push("Tactics: check forcing moves first, then compare strategic plans.");
 
   if (candidateMoves.length > 0) {
     checklist.push(`Review: compare your choice with these practical continuations: ${candidateMoves.join(", ")}.`);
   }
 
-  checklist.push("Endgame: ask which pieces you would like to exchange and what endgame would favor your side.");
+  checklist.push("Memory: write one sentence about what you want to remember from this position.");
   return checklist.slice(0, 5);
 }
 
@@ -390,6 +522,35 @@ function renderAuthState() {
   authUserEmailElement.textContent = "";
 }
 
+function renderWorkspaceMode() {
+  Object.entries(workspaceModeButtons).forEach(([mode, button]) => {
+    button.classList.toggle("active", state.workspaceMode === mode);
+  });
+
+  workspaceSummaryElement.textContent = WORKSPACE_SUMMARIES[state.workspaceMode];
+  coachToggleElement.checked = state.coachEnabled;
+  coachToggleElement.disabled = state.workspaceMode === "play";
+  analysisColumnElement.classList.toggle("hidden", !analysisEnabled());
+
+  if (state.workspaceMode === "computer" && !state.engineEnabled) {
+    workspaceSummaryElement.textContent =
+      "Vs computer needs Stockfish. Configure STOCKFISH_PATH to unlock this mode.";
+  }
+}
+
+function renderGameStatus(status = currentPositionStatus()) {
+  const statusKey = (status.key || "in_progress").replaceAll("_", "-");
+  gameStatusBadgeElement.className = `status-badge status-${statusKey}`;
+  gameStatusBadgeElement.textContent = status.label || "In progress";
+  gameStatusSummaryElement.textContent = status.summary || "The game is still in progress.";
+
+  if (status.is_checkmate) {
+    setStatus(status.summary);
+  } else if (status.is_check) {
+    setStatus(status.summary);
+  }
+}
+
 function renderBoard() {
   const fen = currentFen();
   const pieces = parseFenBoard(fen);
@@ -397,6 +558,7 @@ function renderBoard() {
   turnBadgeElement.textContent = `Turn: ${activeColorFromFen(fen)}`;
   fenBoxElement.textContent = fen;
   modeHintElement.textContent = MODE_HINTS[state.mode];
+  renderGameStatus();
 
   orderedSquares().forEach((square) => {
     const fileIndex = "abcdefgh".indexOf(square[0]);
@@ -589,22 +751,47 @@ function setEngineState(result) {
 }
 
 function renderOpening(opening) {
+  const result = state.lastAnalysis;
+  const phase = studyPhaseData(result);
   openingResponsesElement.innerHTML = "";
   openingLinkWrapElement.innerHTML = "";
-  renderList(openingIdeasListElement, [], "The main opening themes will appear here.");
+  phaseEyebrowElement.textContent = phase.label;
+  phaseOverviewHeadingElement.textContent = "Overview";
+  phaseIdeasHeadingElement.textContent = phase.key === "opening" ? "Key themes" : "Key study ideas";
+  phaseContinuationsHeadingElement.textContent = phase.continuations_label || "Typical replies";
+  phaseChecklistHeadingElement.textContent = "How to study this position";
+  phaseContinuationsSectionElement.classList.remove("hidden");
+  renderList(openingIdeasListElement, [], "The main study ideas will appear here.");
 
   if (!opening || !opening.name) {
-    openingNameElement.textContent = "Opening not identified yet";
-    openingMetaElement.textContent = "Play a few moves to detect the opening.";
-    openingSummaryElement.textContent =
-      "When available, the app will show the opening name, ECO code, parent opening, and educational context.";
-    renderList(studyChecklistListElement, [], "Play a move to generate a study checklist.");
+    if (state.currentPly === 0) {
+      phaseEyebrowElement.textContent = "Opening";
+      phaseIdeasHeadingElement.textContent = "Key themes";
+      phaseContinuationsHeadingElement.textContent = "Typical replies";
+      openingNameElement.textContent = "Opening not identified yet";
+      openingMetaElement.textContent = "Play a few moves to detect the opening.";
+      openingSummaryElement.textContent =
+        "When available, the app will show the opening name, ECO code, parent opening, and educational context.";
+      phaseContinuationsSectionElement.classList.add("hidden");
+      renderList(studyChecklistListElement, [], "Play a move to generate a study checklist.");
+      return;
+    }
+
+    openingNameElement.textContent = phase.title;
+    openingMetaElement.textContent = phase.meta;
+    openingSummaryElement.textContent = phase.summary;
+    phaseContinuationsSectionElement.classList.add("hidden");
+    renderList(
+      studyChecklistListElement,
+      buildStudyChecklist(result),
+      "Use the study checklist to organize the position.",
+    );
     return;
   }
 
-  openingNameElement.textContent = opening.name;
-  openingMetaElement.textContent = [opening.eco, opening.parent].filter(Boolean).join(" • ") || "Opening information";
-  openingSummaryElement.textContent = opening.summary || "Wikibooks has an opening page for this line.";
+  openingNameElement.textContent = phase.title;
+  openingMetaElement.textContent = [opening.eco, opening.parent].filter(Boolean).join(" • ") || phase.meta;
+  openingSummaryElement.textContent = opening.summary || phase.summary || "Wikibooks has an opening page for this line.";
 
   (opening.common_responses || []).slice(0, 8).forEach((response) => {
     const chip = document.createElement("span");
@@ -613,12 +800,17 @@ function renderOpening(opening) {
     openingResponsesElement.appendChild(chip);
   });
 
+  phaseContinuationsSectionElement.classList.toggle(
+    "hidden",
+    !opening.common_responses || opening.common_responses.length === 0,
+  );
+
   if (opening.wikibooks_url) {
     const link = document.createElement("a");
     link.href = opening.wikibooks_url;
     link.target = "_blank";
     link.rel = "noreferrer";
-    link.textContent = "Open Wikibooks page";
+    link.textContent = phase.source_label || "Open Wikibooks page";
     openingLinkWrapElement.appendChild(link);
   }
 }
@@ -697,6 +889,11 @@ function renderAnalysis(result) {
     return;
   }
 
+  if (result.game_status) {
+    state.positionStatuses[state.currentPly] = result.game_status;
+    renderGameStatus(result.game_status);
+  }
+
   headlineElement.textContent = result.headline;
   renderList(whatHappenedListElement, result.what_happened, "No short explanation available.");
   renderList(keyIdeasListElement, result.key_ideas, "No key ideas were generated.");
@@ -704,7 +901,7 @@ function renderAnalysis(result) {
   renderList(bulletsElement, result.bullets, "No full notes available.");
 
   renderOpening(result.opening);
-  renderList(openingIdeasListElement, openingThemeBullets(result.opening, result), "No opening themes available.");
+  renderList(openingIdeasListElement, openingThemeBullets(result), "No study themes available.");
   renderList(studyChecklistListElement, buildStudyChecklist(result), "No study checklist available.");
   renderCandidates(result);
   renderAi(result);
@@ -720,12 +917,18 @@ function renderPendingAnalysis(moveUci) {
   renderList(watchOutListElement, [], "Loading warnings and tactical alerts...");
   renderList(bulletsElement, [], "Loading full notes...");
 
-  openingNameElement.textContent = "Opening analysis is loading";
-  openingMetaElement.textContent = "Checking opening name, ECO code, and typical replies.";
-  openingSummaryElement.innerHTML = inlineLoadingMarkup("Loading opening context");
-  renderList(openingIdeasListElement, [], "Loading opening themes...");
+  phaseEyebrowElement.textContent = "Study phase";
+  phaseOverviewHeadingElement.textContent = "Overview";
+  phaseIdeasHeadingElement.textContent = "Key study ideas";
+  phaseContinuationsHeadingElement.textContent = "Likely continuations";
+  phaseChecklistHeadingElement.textContent = "How to study this position";
+  openingNameElement.textContent = "Position study is loading";
+  openingMetaElement.textContent = "Checking whether this is still opening theory, middlegame play, or an endgame.";
+  openingSummaryElement.innerHTML = inlineLoadingMarkup("Loading phase context");
+  renderList(openingIdeasListElement, [], "Loading study ideas...");
   openingResponsesElement.innerHTML = "";
   openingLinkWrapElement.innerHTML = "";
+  phaseContinuationsSectionElement.classList.remove("hidden");
   renderList(studyChecklistListElement, [], "Loading the study checklist...");
 
   candidateMovesElement.innerHTML = inlineLoadingMarkup("Loading engine candidate moves");
@@ -819,6 +1022,15 @@ function renderNoteEditors() {
 
 async function analyseCurrentPly() {
   const requestId = ++state.analysisRequestId;
+  if (!analysisEnabled()) {
+    setAnalysisLoading(false);
+    renderAnalysis(null);
+    renderBoard();
+    renderMoveList();
+    renderNoteEditors();
+    return;
+  }
+
   if (state.currentPly === 0) {
     setAnalysisLoading(false);
     renderAnalysis(null);
@@ -876,6 +1088,55 @@ async function analyseCurrentPly() {
     setAnalysisLoading(false);
     throw error;
   }
+}
+
+function showCurrentPlyImmediately() {
+  state.selectedSquare = null;
+  state.legalTargets = [];
+  renderBoard();
+  renderMoveList();
+  renderNoteEditors();
+
+  if (!analysisEnabled()) {
+    setAnalysisLoading(false);
+    renderAnalysis(null);
+    return;
+  }
+
+  if (state.currentPly === 0) {
+    setAnalysisLoading(false);
+    renderAnalysis(null);
+    return;
+  }
+
+  const cached = currentCachedAnalysis();
+  if (cached) {
+    setAnalysisLoading(false);
+    renderAnalysis(cached);
+    return;
+  }
+
+  const moveUci = state.moveHistoryUci[state.currentPly - 1];
+  renderPendingAnalysis(moveUci);
+  setAnalysisLoading(true, `Analyzing ${moveUci}...`);
+}
+
+function navigateToPly(ply, statusMessage = null) {
+  state.currentPly = ply;
+  showCurrentPlyImmediately();
+  if (statusMessage) {
+    setStatus(statusMessage);
+  }
+  const targetPly = state.currentPly;
+  void afterNextPaint().then(() => {
+    if (state.currentPly !== targetPly) {
+      return;
+    }
+    return analyseCurrentPly();
+  }).catch((error) => {
+    setAnalysisLoading(false);
+    setStatus(error.message);
+  });
 }
 
 function scheduleAutosave() {
@@ -987,8 +1248,8 @@ function truncateFuture() {
   });
 }
 
-async function submitMove(fromSquare, toSquare) {
-  const moveUci = `${fromSquare}${toSquare}`;
+async function submitMove(fromSquare, toSquare, promotion = null) {
+  const moveUci = `${fromSquare}${toSquare}${promotion || ""}`;
   if (state.currentPly < state.moveHistoryUci.length) {
     truncateFuture();
   }
@@ -1001,14 +1262,121 @@ async function submitMove(fromSquare, toSquare) {
   renderBoard();
   renderMoveList();
   renderNoteEditors();
+  scheduleAutosave();
+  const status = currentPositionStatus();
+  setStatus(status.is_game_over ? status.summary : `Played ${state.sanMoveHistory[state.currentPly - 1] || moveUci}.`);
+
+  if (status.is_game_over) {
+    if (!analysisEnabled()) {
+      setAnalysisLoading(false);
+      renderAnalysis(null);
+      return;
+    }
+    renderPendingAnalysis(moveUci);
+    setAnalysisLoading(true, `Analyzing ${moveUci}...`);
+    const targetPly = state.currentPly;
+    void afterNextPaint().then(() => {
+      if (state.currentPly !== targetPly) {
+        return;
+      }
+      return analyseCurrentPly();
+    }).catch((error) => {
+      setAnalysisLoading(false);
+      setStatus(error.message);
+    });
+    return;
+  }
+
+  if (computerModeEnabled() && currentTurnCode() === "b") {
+    setAnalysisLoading(true, "Computer is thinking...");
+    renderPendingAnalysis(moveUci);
+    await requestComputerReply();
+    return;
+  }
+
+  if (!analysisEnabled()) {
+    setAnalysisLoading(false);
+    renderAnalysis(null);
+    return;
+  }
+
   renderPendingAnalysis(moveUci);
   setAnalysisLoading(true, `Analyzing ${moveUci}...`);
-  scheduleAutosave();
-  setStatus(`Played ${moveUci}.`);
-  void analyseCurrentPly().catch((error) => {
+  const targetPly = state.currentPly;
+  void afterNextPaint().then(() => {
+    if (state.currentPly !== targetPly) {
+      return;
+    }
+    return analyseCurrentPly();
+  }).catch((error) => {
     setAnalysisLoading(false);
     setStatus(error.message);
   });
+}
+
+async function requestComputerReply() {
+  if (!computerModeEnabled()) {
+    return;
+  }
+  if (!state.engineEnabled) {
+    setAnalysisLoading(false);
+    setStatus("Stockfish is required for vs computer mode.");
+    return;
+  }
+  if (state.computerThinking) {
+    return;
+  }
+
+  state.computerThinking = true;
+  try {
+    const result = await fetchJson("/api/engine-move", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fen: currentFen(),
+        move_history_uci: state.moveHistoryUci,
+      }),
+    });
+
+    if (state.currentPly < state.moveHistoryUci.length) {
+      truncateFuture();
+    }
+
+    state.moveHistoryUci = [...state.moveHistoryUci, result.uci];
+    state.currentPly += 1;
+    state.selectedSquare = null;
+    state.legalTargets = [];
+    await rebuildFenHistory();
+    renderBoard();
+    renderMoveList();
+    renderNoteEditors();
+    scheduleAutosave();
+    const status = currentPositionStatus();
+    setStatus(status.is_game_over ? status.summary : `Computer played ${result.san}.`);
+
+    if (!analysisEnabled()) {
+      setAnalysisLoading(false);
+      renderAnalysis(null);
+      return;
+    }
+
+    renderPendingAnalysis(result.uci);
+    const targetPly = state.currentPly;
+    void afterNextPaint().then(() => {
+      if (state.currentPly !== targetPly) {
+        return;
+      }
+      return analyseCurrentPly();
+    }).catch((error) => {
+      setAnalysisLoading(false);
+      setStatus(error.message);
+    });
+  } catch (error) {
+    setAnalysisLoading(false);
+    setStatus(error.message);
+  } finally {
+    state.computerThinking = false;
+  }
 }
 
 async function selectSquare(square) {
@@ -1106,6 +1474,15 @@ function finishRightDrag(square, event) {
 
 async function handleSquareClick(square, piece) {
   try {
+    if (state.promotionResolver) {
+      return;
+    }
+
+    if (state.computerThinking) {
+      setStatus("Wait for the computer move.");
+      return;
+    }
+
     if (state.rightDragAnchor) {
       return;
     }
@@ -1128,9 +1505,25 @@ async function handleSquareClick(square, piece) {
     }
 
     const activeTurn = currentTurnCode();
+    const status = currentPositionStatus();
+
+    if (status.is_game_over) {
+      setStatus(status.summary);
+      return;
+    }
+
+    if (computerModeEnabled() && activeTurn === "b") {
+      setStatus("It is the computer's turn.");
+      return;
+    }
 
     if (state.selectedSquare && state.legalTargets.includes(square)) {
-      await submitMove(state.selectedSquare, square);
+      let promotion = null;
+      if (promotionNeeded(state.selectedSquare, square)) {
+        setStatus("Choose the promotion piece.");
+        promotion = await promptPromotionChoice();
+      }
+      await submitMove(state.selectedSquare, square, promotion);
       return;
     }
 
@@ -1159,26 +1552,21 @@ async function handleSquareClick(square, piece) {
 }
 
 async function jumpToPly(ply) {
-  state.currentPly = ply;
-  state.selectedSquare = null;
-  state.legalTargets = [];
-  await analyseCurrentPly();
+  navigateToPly(ply);
 }
 
 async function undo() {
   if (state.currentPly === 0) {
     return;
   }
-  state.currentPly -= 1;
-  await analyseCurrentPly();
+  navigateToPly(state.currentPly - 1, "Moved back.");
 }
 
 async function redo() {
   if (state.currentPly >= state.moveHistoryUci.length) {
     return;
   }
-  state.currentPly += 1;
-  await analyseCurrentPly();
+  navigateToPly(state.currentPly + 1, "Moved forward.");
 }
 
 function bindModeButtons() {
@@ -1300,11 +1688,91 @@ async function logout() {
   await syncWorkspaceAfterAuth("Signed out. Back to guest studies.");
 }
 
+function downloadBlob(content, fileName, contentType) {
+  const blob = new Blob([content], { type: contentType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function exportStudyMarkdown() {
+  if (!state.studyId) {
+    setStatus("Open a study before exporting.");
+    return;
+  }
+  const response = await fetch(`/api/studies/${state.studyId}/export.md`);
+  if (!response.ok) {
+    throw new Error("Could not export the study.");
+  }
+  const content = await response.text();
+  downloadBlob(content, `${state.title || "study"}.md`, "text/markdown");
+  setStatus("Markdown export downloaded.");
+}
+
+async function exportStudyJson() {
+  if (!state.studyId) {
+    setStatus("Open a study before exporting.");
+    return;
+  }
+  const study = await fetchJson(`/api/studies/${state.studyId}`);
+  downloadBlob(JSON.stringify(study, null, 2), `${state.title || "study"}.json`, "application/json");
+  setStatus("JSON export downloaded.");
+}
+
+function bindWorkspaceModes() {
+  Object.entries(workspaceModeButtons).forEach(([mode, button]) => {
+    button.addEventListener("click", () => {
+      if (mode === "computer" && !state.engineEnabled) {
+        setStatus("Stockfish is required for vs computer mode.");
+        renderWorkspaceMode();
+        return;
+      }
+
+      state.workspaceMode = mode;
+      localStorage.setItem("chessStudy:workspaceMode", state.workspaceMode);
+      renderWorkspaceMode();
+      showCurrentPlyImmediately();
+      if (analysisEnabled()) {
+        void analyseCurrentPly().catch((error) => setStatus(error.message));
+      } else {
+        setStatus(mode === "play" ? "Play mode enabled." : "Vs computer mode enabled.");
+      }
+    });
+  });
+
+  coachToggleElement.addEventListener("change", () => {
+    state.coachEnabled = coachToggleElement.checked;
+    localStorage.setItem("chessStudy:coachEnabled", state.coachEnabled ? "1" : "0");
+    renderWorkspaceMode();
+    showCurrentPlyImmediately();
+    if (analysisEnabled()) {
+      void analyseCurrentPly().catch((error) => setStatus(error.message));
+    } else {
+      setStatus("Coach help hidden.");
+    }
+  });
+}
+
+function bindPromotionModal() {
+  promotionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      resolvePromotionChoice(button.dataset.piece);
+    });
+  });
+}
+
 async function bootstrap() {
   bindModeButtons();
+  bindWorkspaceModes();
   bindColorButtons();
   bindKeyboardShortcuts();
   bindNoteEditors();
+  bindPromotionModal();
 
   applyTextEditsButton.addEventListener("click", () => applyStudyTextEdits());
   resetTextEditsButton.addEventListener("click", () => resetStudyTextEdits());
@@ -1319,6 +1787,12 @@ async function bootstrap() {
   });
   newStudyButton.addEventListener("click", () => void createNewStudy());
   saveStudyButton.addEventListener("click", () => void saveCurrentStudy());
+  exportMarkdownButton.addEventListener("click", () => {
+    void exportStudyMarkdown().catch((error) => setStatus(error.message));
+  });
+  exportJsonButton.addEventListener("click", () => {
+    void exportStudyJson().catch((error) => setStatus(error.message));
+  });
   undoButton.addEventListener("click", () => void undo());
   redoButton.addEventListener("click", () => void redo());
   clearAnnotationsButton.addEventListener("click", () => clearCurrentAnnotations());
@@ -1342,6 +1816,9 @@ async function bootstrap() {
   state.engineEnabled = engineStatus.enabled;
   state.aiEnabled = aiStatus.enabled;
   state.aiModel = aiStatus.model;
+  state.workspaceMode = localStorage.getItem("chessStudy:workspaceMode") || "study";
+  state.coachEnabled = localStorage.getItem("chessStudy:coachEnabled") !== "0";
+  renderWorkspaceMode();
   await loadAuthState();
   await refreshStudies();
   const lastStudyId = localStorage.getItem("chessStudy:lastStudyId");

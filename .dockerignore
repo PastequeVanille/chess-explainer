@@ -1,6 +1,14 @@
 .git
-.pytest_cache
+.gitignore
 .venv
 __pycache__
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache
 .DS_Store
+.env
+data/studies/users
+data/studies/*.json
+docs
+tests

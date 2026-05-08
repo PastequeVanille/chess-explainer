@@ -9,7 +9,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 from ..config import get_settings
-from .opening_service import lookup_opening
+from .opening_service import is_opening_sequence, lookup_opening
 
 WIKIBOOKS_PAGE_BASE = "https://en.wikibooks.org/wiki/"
 WIKIBOOKS_API_URL = "https://en.wikibooks.org/w/api.php"
@@ -31,6 +31,9 @@ def fetch_opening_explanation(
     current_move_uci: str,
     client: httpx.Client | None = None,
 ) -> WikibooksExplanation | None:
+    if not is_opening_sequence(move_history_uci, current_move_uci):
+        return None
+
     san_moves = _uci_history_to_san_history(move_history_uci, current_move_uci)
     if not san_moves:
         return None

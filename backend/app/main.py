@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from .models import (
@@ -15,6 +15,8 @@ from .models import (
     AiStatusResponse,
     AuthUserResponse,
     LegalMovesResponse,
+    EngineMoveRequest,
+    EngineMoveResponse,
     MoveExplanationRequest,
     MoveExplanationResponse,
     StudyCreateRequest,
@@ -22,9 +24,15 @@ from .models import (
     StudySummaryResponse,
     StudyUpdateRequest,
 )
-from .services.chess_service import build_fen_history, explain_move, initial_game_state, legal_targets
+from .services.chess_service import (
+    build_game_timeline,
+    compute_engine_move,
+    explain_move,
+    initial_game_state,
+    legal_targets,
+)
 from .config import get_settings
-from .services.study_service import create_study, get_study, list_studies, save_study
+from .services.study_service import create_study, export_study_markdown, get_study, list_studies, save_study
 from .services.auth_service import (
     SESSION_COOKIE_NAME,
     clear_session,
@@ -129,10 +137,20 @@ def explain(payload: MoveExplanationRequest) -> MoveExplanationResponse:
     return MoveExplanationResponse(**result)
 
 
-@app.get("/api/fen-history")
-def fen_history(move_history_uci: list[str] = Query(default_factory=list)) -> dict[str, list[str]]:
+@app.post("/api/engine-move", response_model=EngineMoveResponse)
+def engine_move(payload: EngineMoveRequest) -> EngineMoveResponse:
     try:
-        return {"history": build_fen_history(move_history_uci)}
+        result = compute_engine_move(payload.fen, payload.move_history_uci)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return EngineMoveResponse(**result)
+
+
+@app.get("/api/fen-history")
+def fen_history(move_history_uci: list[str] = Query(default_factory=list)) -> dict[str, list]:
+    try:
+        return build_game_timeline(move_history_uci)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -161,6 +179,20 @@ def save_study_endpoint(study_id: str, payload: StudyUpdateRequest, request: Req
         return save_study(study_id, payload, _owner_key(request))
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Study not found") from exc
+
+
+@app.get("/api/studies/{study_id}/export.md")
+def export_study_markdown_endpoint(study_id: str, request: Request) -> PlainTextResponse:
+    try:
+        content = export_study_markdown(study_id, _owner_key(request))
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Study not found") from exc
+
+    return PlainTextResponse(
+        content,
+        media_type="text/markdown",
+        headers={"Content-Disposition": f'attachment; filename="{study_id}.md"'},
+    )
 
 
 @app.get("/")

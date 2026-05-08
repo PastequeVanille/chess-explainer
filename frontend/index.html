@@ -20,6 +20,24 @@
           <p class="muted">Engine, opening context, Wikibooks, notes, annotations, and your own training memory in one place.</p>
         </div>
 
+        <section class="sidebar-section">
+          <div class="section-head">
+            <p class="eyebrow">Workspace mode</p>
+          </div>
+          <div class="mode-switch">
+            <button id="workspaceModeStudy" class="tool-button active" type="button">Study</button>
+            <button id="workspaceModePlay" class="tool-button" type="button">Play</button>
+            <button id="workspaceModeComputer" class="tool-button" type="button">Vs computer</button>
+          </div>
+          <p id="workspaceSummary" class="section-copy compact">
+            Study mode keeps the full explanation visible while you build notes.
+          </p>
+          <label class="toggle-row" for="coachToggle">
+            <span>Coach help</span>
+            <input id="coachToggle" type="checkbox" checked />
+          </label>
+        </section>
+
         <section class="sidebar-section auth-card">
           <div class="section-head">
             <p class="eyebrow">Account</p>
@@ -59,6 +77,16 @@
             <p class="eyebrow">Saved studies</p>
           </div>
           <div id="studiesList" class="study-list"></div>
+        </section>
+
+        <section class="sidebar-section">
+          <div class="section-head">
+            <p class="eyebrow">Export</p>
+          </div>
+          <div class="sidebar-actions">
+            <button id="exportMarkdownButton" class="ghost-button" type="button">Export Markdown</button>
+            <button id="exportJsonButton" class="ghost-button" type="button">Export JSON</button>
+          </div>
         </section>
       </aside>
 
@@ -112,6 +140,11 @@
               Install Stockfish and configure `STOCKFISH_PATH` to unlock engine judgement.
             </p>
 
+            <div id="gameStatusPanel" class="game-status-panel">
+              <span id="gameStatusBadge" class="status-badge status-in-progress">In progress</span>
+              <p id="gameStatusSummary" class="muted compact">The game is still in progress.</p>
+            </div>
+
             <div id="boardContainer" class="board-container">
               <div id="board" class="board" aria-label="Interactive chessboard"></div>
               <div id="highlightLayer" class="highlight-layer"></div>
@@ -139,29 +172,29 @@
           </section>
         </section>
 
-        <section class="analysis-column">
+        <section id="analysisColumn" class="analysis-column">
           <section class="analysis-card">
-            <p class="eyebrow">Opening</p>
+            <p id="phaseEyebrow" class="eyebrow">Opening</p>
             <h2 id="openingName">Opening not identified yet</h2>
             <p id="openingMeta" class="muted compact">Play a few moves to detect the opening.</p>
             <div class="study-section">
-              <h3>Overview</h3>
+              <h3 id="phaseOverviewHeading">Overview</h3>
               <p id="openingSummary" class="section-copy">
                 Wikibooks and opening context will appear here when available.
               </p>
             </div>
             <div class="study-section">
-              <h3>Key themes</h3>
+              <h3 id="phaseIdeasHeading">Key themes</h3>
               <ul id="openingIdeasList" class="bullets">
                 <li>The opening themes will appear here.</li>
               </ul>
             </div>
-            <div class="study-section">
-              <h3>Typical replies</h3>
+            <div id="phaseContinuationsSection" class="study-section">
+              <h3 id="phaseContinuationsHeading">Typical replies</h3>
               <div id="openingResponses" class="tag-list"></div>
             </div>
             <div class="study-section">
-              <h3>How to study this position</h3>
+              <h3 id="phaseChecklistHeading">How to study this position</h3>
               <ul id="studyChecklistList" class="bullets">
                 <li>Play a move to generate a study checklist.</li>
               </ul>
@@ -175,30 +208,34 @@
             <p id="engineLine" class="section-copy">
               The move assessment will explain whether the move is good, inaccurate, a mistake, a blunder, or an interesting idea.
             </p>
-            <div class="study-section">
-              <h3>What happened</h3>
-              <ul id="whatHappenedList" class="bullets">
-                <li>Play a move to generate a structured explanation.</li>
-              </ul>
+            <div class="focus-grid">
+              <div class="focus-panel">
+                <h3>What changed</h3>
+                <ul id="whatHappenedList" class="bullets compact-bullets">
+                  <li>Play a move to generate a structured explanation.</li>
+                </ul>
+              </div>
+              <div class="focus-panel">
+                <h3>Keep in mind</h3>
+                <ul id="keyIdeasList" class="bullets compact-bullets">
+                  <li>The app will highlight the main ideas to keep in mind.</li>
+                </ul>
+              </div>
+              <div class="focus-panel">
+                <h3>Be careful</h3>
+                <ul id="watchOutList" class="bullets compact-bullets">
+                  <li>The app will point out tactical or strategic warnings here.</li>
+                </ul>
+              </div>
             </div>
-            <div class="study-section">
-              <h3>Key ideas to remember</h3>
-              <ul id="keyIdeasList" class="bullets">
-                <li>The app will highlight the main ideas to keep in mind.</li>
-              </ul>
-            </div>
-            <div class="study-section">
-              <h3>Watch out</h3>
-              <ul id="watchOutList" class="bullets">
-                <li>The app will point out tactical or strategic warnings here.</li>
-              </ul>
-            </div>
-            <div class="study-section">
-              <h3>Full notes</h3>
-              <ul id="bullets" class="bullets">
-                <li>Play a move to generate a structured explanation.</li>
-              </ul>
-            </div>
+            <details class="collapsible-card">
+              <summary class="collapsible-summary">Detailed notes</summary>
+              <div class="details-body">
+                <ul id="bullets" class="bullets">
+                  <li>Play a move to generate a structured explanation.</li>
+                </ul>
+              </div>
+            </details>
           </section>
 
           <section class="analysis-card">
@@ -219,23 +256,25 @@
                 Add an OpenAI API key if you want a natural-language coaching summary.
               </p>
             </div>
-            <div class="study-section">
-              <h3>Best plan</h3>
-              <ul id="aiPlanList" class="bullets">
-                <li>The AI plan will appear here.</li>
-              </ul>
-            </div>
-            <div class="study-section">
-              <h3>Typical mistake to avoid</h3>
-              <ul id="aiMistakeList" class="bullets">
-                <li>The AI warning will appear here.</li>
-              </ul>
-            </div>
-            <div class="study-section">
-              <h3>Training takeaway</h3>
-              <ul id="aiTakeawayList" class="bullets">
-                <li>The AI takeaway will appear here.</li>
-              </ul>
+            <div class="focus-grid">
+              <div class="focus-panel">
+                <h3>Best plan</h3>
+                <ul id="aiPlanList" class="bullets compact-bullets">
+                  <li>The AI plan will appear here.</li>
+                </ul>
+              </div>
+              <div class="focus-panel">
+                <h3>Mistake to avoid</h3>
+                <ul id="aiMistakeList" class="bullets compact-bullets">
+                  <li>The AI warning will appear here.</li>
+                </ul>
+              </div>
+              <div class="focus-panel">
+                <h3>Takeaway</h3>
+                <ul id="aiTakeawayList" class="bullets compact-bullets">
+                  <li>The AI takeaway will appear here.</li>
+                </ul>
+              </div>
             </div>
           </section>
 
@@ -251,48 +290,69 @@
             ></textarea>
           </section>
 
-          <section class="analysis-card">
-            <div class="section-head">
-              <p class="eyebrow">Editable study text</p>
-              <div class="tool-group">
-                <button id="applyTextEditsButton" class="ghost-button" type="button">Apply text edits</button>
-                <button id="resetTextEditsButton" class="ghost-button" type="button">Reset text</button>
+          <details class="analysis-card collapsible-card">
+            <summary class="collapsible-summary">
+              <span>Advanced text editor</span>
+            </summary>
+            <div class="details-body">
+              <div class="section-head compact-actions">
+                <p class="muted compact">Edit the generated text only if you want to personalize the study sheet.</p>
+                <div class="tool-group">
+                  <button id="applyTextEditsButton" class="ghost-button" type="button">Apply text edits</button>
+                  <button id="resetTextEditsButton" class="ghost-button" type="button">Reset text</button>
+                </div>
               </div>
+              <label class="field-label" for="editOpeningNameInput">Opening title</label>
+              <input id="editOpeningNameInput" class="text-input" type="text" placeholder="Opening title" />
+              <label class="field-label" for="editOpeningSummaryInput">Opening overview</label>
+              <textarea id="editOpeningSummaryInput" class="textarea" placeholder="Organize the opening overview..."></textarea>
+              <label class="field-label" for="editOpeningResponsesInput">Typical replies</label>
+              <textarea id="editOpeningResponsesInput" class="textarea compact-textarea" placeholder="One line per typical reply..."></textarea>
+              <label class="field-label" for="editHeadlineInput">Assessment headline</label>
+              <input id="editHeadlineInput" class="text-input" type="text" placeholder="Headline" />
+              <label class="field-label" for="editEngineLineInput">Engine line</label>
+              <textarea id="editEngineLineInput" class="textarea compact-textarea" placeholder="Engine verdict summary..."></textarea>
+              <label class="field-label" for="editWhatHappenedInput">What happened</label>
+              <textarea id="editWhatHappenedInput" class="textarea" placeholder="One line per point..."></textarea>
+              <label class="field-label" for="editKeyIdeasInput">Key ideas</label>
+              <textarea id="editKeyIdeasInput" class="textarea" placeholder="One line per point..."></textarea>
+              <label class="field-label" for="editWatchOutInput">Watch out</label>
+              <textarea id="editWatchOutInput" class="textarea" placeholder="One line per warning..."></textarea>
+              <label class="field-label" for="editBulletsInput">Full notes</label>
+              <textarea id="editBulletsInput" class="textarea" placeholder="One line per note..."></textarea>
+              <label class="field-label" for="editAiVerdictInput">Coach verdict</label>
+              <textarea id="editAiVerdictInput" class="textarea compact-textarea" placeholder="Rewrite the verdict..."></textarea>
+              <label class="field-label" for="editAiPlanInput">Best plan</label>
+              <textarea id="editAiPlanInput" class="textarea compact-textarea" placeholder="Rewrite the best plan..."></textarea>
+              <label class="field-label" for="editAiMistakeInput">Typical mistake</label>
+              <textarea id="editAiMistakeInput" class="textarea compact-textarea" placeholder="Rewrite the warning..."></textarea>
+              <label class="field-label" for="editAiTakeawayInput">Training takeaway</label>
+              <textarea id="editAiTakeawayInput" class="textarea compact-textarea" placeholder="Rewrite the takeaway..."></textarea>
             </div>
-            <label class="field-label" for="editOpeningNameInput">Opening title</label>
-            <input id="editOpeningNameInput" class="text-input" type="text" placeholder="Opening title" />
-            <label class="field-label" for="editOpeningSummaryInput">Opening overview</label>
-            <textarea id="editOpeningSummaryInput" class="textarea" placeholder="Organize the opening overview..."></textarea>
-            <label class="field-label" for="editOpeningResponsesInput">Typical replies</label>
-            <textarea id="editOpeningResponsesInput" class="textarea compact-textarea" placeholder="One line per typical reply..."></textarea>
-            <label class="field-label" for="editHeadlineInput">Assessment headline</label>
-            <input id="editHeadlineInput" class="text-input" type="text" placeholder="Headline" />
-            <label class="field-label" for="editEngineLineInput">Engine line</label>
-            <textarea id="editEngineLineInput" class="textarea compact-textarea" placeholder="Engine verdict summary..."></textarea>
-            <label class="field-label" for="editWhatHappenedInput">What happened</label>
-            <textarea id="editWhatHappenedInput" class="textarea" placeholder="One line per point..."></textarea>
-            <label class="field-label" for="editKeyIdeasInput">Key ideas</label>
-            <textarea id="editKeyIdeasInput" class="textarea" placeholder="One line per point..."></textarea>
-            <label class="field-label" for="editWatchOutInput">Watch out</label>
-            <textarea id="editWatchOutInput" class="textarea" placeholder="One line per warning..."></textarea>
-            <label class="field-label" for="editBulletsInput">Full notes</label>
-            <textarea id="editBulletsInput" class="textarea" placeholder="One line per note..."></textarea>
-            <label class="field-label" for="editAiVerdictInput">Coach verdict</label>
-            <textarea id="editAiVerdictInput" class="textarea compact-textarea" placeholder="Rewrite the verdict..."></textarea>
-            <label class="field-label" for="editAiPlanInput">Best plan</label>
-            <textarea id="editAiPlanInput" class="textarea compact-textarea" placeholder="Rewrite the best plan..."></textarea>
-            <label class="field-label" for="editAiMistakeInput">Typical mistake</label>
-            <textarea id="editAiMistakeInput" class="textarea compact-textarea" placeholder="Rewrite the warning..."></textarea>
-            <label class="field-label" for="editAiTakeawayInput">Training takeaway</label>
-            <textarea id="editAiTakeawayInput" class="textarea compact-textarea" placeholder="Rewrite the takeaway..."></textarea>
-          </section>
+          </details>
 
-          <section class="analysis-card">
-            <p class="eyebrow">Position</p>
-            <pre id="fenBox" class="fen-box"></pre>
-          </section>
+          <details class="analysis-card collapsible-card">
+            <summary class="collapsible-summary">Position details</summary>
+            <div class="details-body">
+              <pre id="fenBox" class="fen-box"></pre>
+            </div>
+          </details>
         </section>
       </main>
+    </div>
+
+    <div id="promotionModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="promotionTitle">
+      <div class="modal-card">
+        <p class="eyebrow">Promotion</p>
+        <h2 id="promotionTitle">Choose a piece</h2>
+        <p class="muted compact">Select the piece your pawn should promote to.</p>
+        <div class="promotion-grid">
+          <button class="promotion-button" type="button" data-piece="q">Queen</button>
+          <button class="promotion-button" type="button" data-piece="r">Rook</button>
+          <button class="promotion-button" type="button" data-piece="b">Bishop</button>
+          <button class="promotion-button" type="button" data-piece="n">Knight</button>
+        </div>
+      </div>
     </div>
 
     <script src="/app.js?v=20260402" defer></script>

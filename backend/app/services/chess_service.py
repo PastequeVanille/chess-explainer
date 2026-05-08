@@ -7,7 +7,7 @@ import chess.engine
 
 from ..config import get_settings
 from .ai_service import generate_ai_explanation
-from .engine_service import EngineMoveAnalysis, analyse_move_with_engine
+from .engine_service import EngineMoveAnalysis, analyse_move_with_engine, choose_engine_reply
 from .wikibooks_service import fetch_opening_explanation
 
 
@@ -21,6 +21,12 @@ PIECE_NAMES = {
 }
 
 CENTER_SQUARES = {chess.D4, chess.E4, chess.D5, chess.E5}
+PIECE_VALUES = {
+    chess.KNIGHT: 3,
+    chess.BISHOP: 3,
+    chess.ROOK: 5,
+    chess.QUEEN: 9,
+}
 
 
 def initial_game_state() -> dict[str, str | int]:
@@ -58,6 +64,98 @@ def build_fen_history(move_history_uci: list[str]) -> list[str]:
     return history
 
 
+def build_game_timeline(move_history_uci: list[str]) -> dict[str, list]:
+    board = chess.Board()
+    history = [board.fen()]
+    san_history: list[str] = []
+    statuses = [describe_position(board.fen())]
+
+    for uci in move_history_uci:
+        move = chess.Move.from_uci(uci)
+        if move not in board.legal_moves:
+            raise ValueError(f"Illegal move in history: {uci}")
+        san_history.append(board.san(move))
+        board.push(move)
+        history.append(board.fen())
+        statuses.append(describe_position(board.fen()))
+
+    return {
+        "history": history,
+        "san_history": san_history,
+        "statuses": statuses,
+    }
+
+
+def describe_position(fen: str) -> dict[str, str | bool | None]:
+    board = chess.Board(fen)
+    result = board.result(claim_draw=True) if board.is_game_over(claim_draw=True) else None
+
+    if board.is_checkmate():
+        winner = "black" if board.turn == chess.WHITE else "white"
+        return {
+            "key": "checkmate",
+            "label": "Checkmate",
+            "summary": f"Checkmate. {winner.capitalize()} wins.",
+            "is_check": True,
+            "is_checkmate": True,
+            "is_game_over": True,
+            "result": result,
+            "winner": winner,
+        }
+
+    if board.is_stalemate():
+        return {
+            "key": "stalemate",
+            "label": "Stalemate",
+            "summary": "Stalemate. The game is drawn because the side to move has no legal move and is not in check.",
+            "is_check": False,
+            "is_checkmate": False,
+            "is_game_over": True,
+            "result": result,
+            "winner": None,
+        }
+
+    outcome = board.outcome(claim_draw=True)
+    if outcome is not None:
+        reason = outcome.termination.name.replace("_", " ").lower()
+        winner = None if outcome.winner is None else turn_name(outcome.winner)
+        label = "Draw" if winner is None else f"{winner.capitalize()} wins"
+        return {
+            "key": "game_over",
+            "label": label,
+            "summary": f"Game over by {reason}. Result: {outcome.result()}.",
+            "is_check": board.is_check(),
+            "is_checkmate": False,
+            "is_game_over": True,
+            "result": outcome.result(),
+            "winner": winner,
+        }
+
+    if board.is_check():
+        defender = turn_name(board.turn)
+        return {
+            "key": "check",
+            "label": "Check",
+            "summary": f"{defender.capitalize()} is in check and must answer the threat to the king.",
+            "is_check": True,
+            "is_checkmate": False,
+            "is_game_over": False,
+            "result": None,
+            "winner": None,
+        }
+
+    return {
+        "key": "in_progress",
+        "label": "In progress",
+        "summary": "The game is still in progress.",
+        "is_check": False,
+        "is_checkmate": False,
+        "is_game_over": False,
+        "result": None,
+        "winner": None,
+    }
+
+
 def explain_move(
     fen: str,
     from_square_name: str,
@@ -78,10 +176,11 @@ def explain_move(
 
     board_after = board_before.copy(stack=True)
     board_after.push(move)
-    if board_after.is_check():
+    game_status = describe_position(board_after.fen())
+    if game_status["is_checkmate"]:
+        bullets.append(str(game_status["summary"]))
+    elif game_status["is_check"]:
         bullets.append("The move gives check.")
-    if board_after.is_checkmate():
-        bullets.append("The move ends the game by checkmate.")
 
     engine_analysis = _analyse_move(board_before, move)
     engine_evaluation = None if engine_analysis is None else engine_analysis.after_score_display
@@ -113,6 +212,26 @@ def explain_move(
         bullets=bullets,
         engine_analysis=engine_analysis,
     )
+    if game_status["is_checkmate"]:
+        sections["what_happened"] = [str(game_status["summary"]), *sections["what_happened"]][:3]
+        sections["key_ideas"] = [
+            "The forcing sequence matters most here: checks, captures, and direct threats decide the game.",
+            *sections["key_ideas"],
+        ][:4]
+        sections["watch_out"] = ["The game is over, so there is no defensive resource left.", *sections["watch_out"]][:4]
+    elif game_status["is_check"]:
+        sections["what_happened"] = [str(game_status["summary"]), *sections["what_happened"]][:3]
+        sections["watch_out"] = [
+            "The checked side must answer the king threat before doing anything else.",
+            *sections["watch_out"],
+        ][:4]
+    study_phase = _build_study_phase(
+        board_after=board_after,
+        opening_name=None if opening is None else opening.opening_name,
+        opening_summary=None if opening is None else opening.summary,
+        sections=sections,
+        engine_analysis=engine_analysis,
+    )
     coach = _build_study_coach(
         san=san,
         sections=sections,
@@ -140,6 +259,8 @@ def explain_move(
             "wikibooks_url": None if opening is None else opening.url,
             "common_responses": [] if opening is None or opening.responses is None else opening.responses,
         },
+        "study_phase": study_phase,
+        "game_status": game_status,
         "engine_evaluation": engine_evaluation,
         "ai_summary": coach["verdict"],
         "ai_coaching_points": [
@@ -172,6 +293,35 @@ def explain_move(
             for candidate in engine_analysis.candidate_moves
         ],
     }
+
+
+def compute_engine_move(
+    fen: str,
+    move_history_uci: list[str] | None = None,
+) -> dict[str, str | int]:
+    del move_history_uci
+    stockfish_path = get_settings().stockfish_path
+    if not stockfish_path:
+        raise ValueError("Stockfish is not configured.")
+
+    board = chess.Board(fen)
+    if board.is_game_over():
+        raise ValueError("The game is already over.")
+
+    with suppress(FileNotFoundError, chess.engine.EngineError):
+        with chess.engine.SimpleEngine.popen_uci(stockfish_path) as engine:
+            reply = choose_engine_reply(engine, board)
+            board_after = chess.Board(reply.fen_after)
+            return {
+                "uci": reply.uci,
+                "san": reply.san,
+                "fen_after": reply.fen_after,
+                "turn": turn_name(board_after.turn),
+                "move_number": board_after.fullmove_number,
+                "game_status": describe_position(reply.fen_after),
+            }
+
+    raise ValueError("Stockfish could not be started.")
 
 
 def turn_name(turn: bool) -> str:
@@ -333,3 +483,94 @@ def _build_study_coach(
         "typical_mistake": typical_mistake,
         "training_takeaway": training_takeaway,
     }
+
+
+def _build_study_phase(
+    board_after: chess.Board,
+    opening_name: str | None,
+    opening_summary: str | None,
+    sections: dict[str, list[str]],
+    engine_analysis: EngineMoveAnalysis | None,
+) -> dict[str, str | list[str] | None]:
+    if opening_name:
+        ideas = sections["key_ideas"][:3]
+        if not ideas:
+            ideas = [
+                "Learn the purpose of the line before memorizing move order.",
+                "Tie each move to development, central control, and king safety.",
+            ]
+        return {
+            "key": "opening",
+            "label": "Opening",
+            "title": opening_name,
+            "meta": "Wikibooks and opening references are available for this line.",
+            "summary": opening_summary
+            or "Use the opening reference to connect move order with plans, structure, and typical continuations.",
+            "ideas": ideas,
+            "continuations_label": "Typical replies",
+            "source_label": "Wikibooks opening reference",
+        }
+
+    phase_key = _infer_phase_key(board_after)
+    if phase_key == "endgame":
+        summary = (
+            "Opening references no longer apply here. Endgame study should focus on king activity, passed pawns, "
+            "piece exchanges, and concrete calculation."
+        )
+        if engine_analysis is not None:
+            summary = f"{engine_analysis.move_quality_summary} {summary}"
+        return {
+            "key": "endgame",
+            "label": "Endgame",
+            "title": "Endgame study",
+            "meta": "Technique matters more than memorized theory in this phase.",
+            "summary": summary,
+            "ideas": [
+                "Activate the king as soon as it is safe and useful.",
+                "Track passed pawns, pawn majorities, and races before choosing exchanges.",
+                "Ask which endgame improves for your side before simplifying.",
+            ],
+            "continuations_label": "Critical continuations",
+            "source_label": None,
+        }
+
+    summary = (
+        "The opening phase is over. Study plans, pawn breaks, king safety, piece activity, and tactical motifs "
+        "instead of looking for a memorized line."
+    )
+    if engine_analysis is not None:
+        summary = f"{engine_analysis.move_quality_summary} {summary}"
+    return {
+        "key": "middlegame",
+        "label": "Middlegame",
+        "title": "Middlegame study",
+        "meta": "No opening reference applies here. Focus on plans and imbalances.",
+        "summary": summary,
+        "ideas": [
+            "Identify the pawn breaks both sides are aiming for.",
+            "Improve the worst-placed piece before starting a new attack.",
+            "Compare king safety and piece coordination before forcing tactics.",
+        ],
+        "continuations_label": "Plans to compare",
+        "source_label": None,
+    }
+
+
+def _infer_phase_key(board: chess.Board) -> str:
+    non_pawn_material = _count_non_pawn_material(board)
+    queen_count = len(board.pieces(chess.QUEEN, chess.WHITE)) + len(board.pieces(chess.QUEEN, chess.BLACK))
+
+    if non_pawn_material <= 14:
+        return "endgame"
+    if queen_count == 0 and non_pawn_material <= 20:
+        return "endgame"
+    return "middlegame"
+
+
+def _count_non_pawn_material(board: chess.Board) -> int:
+    total = 0
+    for piece_type, value in PIECE_VALUES.items():
+        total += value * (
+            len(board.pieces(piece_type, chess.WHITE)) + len(board.pieces(piece_type, chess.BLACK))
+        )
+    return total

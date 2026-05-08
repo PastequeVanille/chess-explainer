@@ -48,6 +48,18 @@ class _FailingClient:
         return None
 
 
+class _TrackingClient:
+    def __init__(self):
+        self.calls = 0
+
+    def get(self, *args, **kwargs):
+        self.calls += 1
+        raise AssertionError("The client should not be called outside the opening phase")
+
+    def close(self):
+        return None
+
+
 def test_build_wikibooks_title() -> None:
     title = _debug_build_title_from_san(["e4", "e5", "Nf3"])
     assert title == "Chess Opening Theory/1. e4/1...e5/2. Nf3"
@@ -96,3 +108,25 @@ def test_fetch_opening_explanation_falls_back_to_local_opening_when_wikibooks_fa
     assert result.opening_name == "Open Game"
     assert result.eco == "C20-C99"
     assert "open positions" in result.summary.lower()
+
+
+def test_fetch_opening_explanation_returns_none_once_out_of_opening_phase() -> None:
+    client = _TrackingClient()
+    result = fetch_opening_explanation(
+        [
+            "e2e4",
+            "e7e5",
+            "g1f3",
+            "b8c6",
+            "f1c4",
+            "f8c5",
+            "c2c3",
+            "g8f6",
+            "d2d4",
+            "e5d4",
+        ],
+        "c3d4",
+        client=client,
+    )
+    assert result is None
+    assert client.calls == 0

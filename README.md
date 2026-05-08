@@ -53,3 +53,30 @@ It will not work with `APE_KEY`.
 2. [02-run-locally.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/02-run-locally.md)
 3. [03-learning-path.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/03-learning-path.md)
 4. [04-engine-analysis.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/04-engine-analysis.md)
+5. [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
+
+## Deploy on AWS
+
+For a free-friendly demo, the recommended deployment is a single EC2 instance with Docker Compose.
+
+Use:
+
+- [docker-compose.aws.yml](/Users/guillaume/Documents/CODEX/chess-explainer/docker-compose.aws.yml)
+- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/ec2/bootstrap-ubuntu.sh)
+- [deploy-from-github.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/ec2/deploy-from-github.sh)
+- [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
+
+This is much cheaper and simpler than Amazon EKS for a first public demo.
+
+## GitHub workflow
+
+The repository now includes a CI workflow:
+
+- [.github/workflows/ci.yml](/Users/guillaume/Documents/CODEX/chess-explainer/.github/workflows/ci.yml)
+
+This gives you a clean story:
+
+- develop locally
+- push to GitHub
+- let GitHub Actions run the tests
+- redeploy on EC2 from GitHub

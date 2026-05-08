@@ -189,3 +189,13 @@ def lookup_opening(move_history_uci: list[str], current_move_uci: str) -> LocalO
         if best_match is None or len(opening.moves) > len(best_match.moves):
             best_match = opening
     return best_match
+
+
+def is_opening_sequence(move_history_uci: list[str], current_move_uci: str) -> bool:
+    sequence = tuple([*move_history_uci, current_move_uci])
+    for opening in OPENING_BOOK:
+        if len(sequence) > len(opening.moves):
+            continue
+        if opening.moves[: len(sequence)] == sequence:
+            return True
+    return False

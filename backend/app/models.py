@@ -54,11 +54,38 @@ class OpeningInfoResponse(BaseModel):
     common_responses: list[str] = Field(default_factory=list)
 
 
+class StudyPhaseResponse(BaseModel):
+    key: str = "opening"
+    label: str = "Opening"
+    title: str = "Opening study"
+    meta: str = ""
+    summary: str = ""
+    ideas: list[str] = Field(default_factory=list)
+    continuations_label: str = "Typical replies"
+    source_label: str | None = None
+
+
+class PositionStatusResponse(BaseModel):
+    key: str = "in_progress"
+    label: str = "In progress"
+    summary: str = "The game is still in progress."
+    is_check: bool = False
+    is_checkmate: bool = False
+    is_game_over: bool = False
+    result: str | None = None
+    winner: str | None = None
+
+
 class MoveExplanationRequest(BaseModel):
     fen: str
     from_square: str = Field(pattern=r"^[a-h][1-8]$")
     to_square: str = Field(pattern=r"^[a-h][1-8]$")
     promotion: str | None = Field(default=None, pattern=r"^[qrbn]$")
+    move_history_uci: list[str] = Field(default_factory=list)
+
+
+class EngineMoveRequest(BaseModel):
+    fen: str
     move_history_uci: list[str] = Field(default_factory=list)
 
 
@@ -74,6 +101,8 @@ class MoveExplanationResponse(BaseModel):
     key_ideas: list[str] = Field(default_factory=list)
     watch_out: list[str] = Field(default_factory=list)
     opening: OpeningInfoResponse = Field(default_factory=OpeningInfoResponse)
+    study_phase: StudyPhaseResponse = Field(default_factory=StudyPhaseResponse)
+    game_status: PositionStatusResponse = Field(default_factory=PositionStatusResponse)
     engine_evaluation: str | None = None
     ai_summary: str | None = None
     ai_coaching_points: list[str] = Field(default_factory=list)
@@ -92,6 +121,15 @@ class MoveExplanationResponse(BaseModel):
     move_quality_summary: str | None = None
     evaluation_bar_white_pct: int | None = None
     candidate_moves: list[CandidateMoveResponse] = Field(default_factory=list)
+
+
+class EngineMoveResponse(BaseModel):
+    uci: str
+    san: str
+    fen_after: str
+    turn: str
+    move_number: int
+    game_status: PositionStatusResponse = Field(default_factory=PositionStatusResponse)
 
 
 class ArrowAnnotation(BaseModel):
