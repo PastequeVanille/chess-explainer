@@ -77,6 +77,13 @@ If you want a real Kubernetes demo without Amazon EKS cost, use:
 - [deploy-k3s.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/k3s/deploy-k3s.sh)
 - [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
 
+For the smallest and most reliable Kubernetes demo on EC2:
+
+- use the K3s path above
+- keep Dynatrace optional
+- expose the app through the fixed NodePort `31410`
+- allow TCP `31410` in the EC2 security group
+
 ## GitHub workflow
 
 The repository now includes a CI workflow:

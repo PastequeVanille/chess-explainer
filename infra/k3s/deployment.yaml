@@ -13,10 +13,17 @@ spec:
       labels:
         app: chess-explainer
     spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
       containers:
         - name: web
           image: chess-explainer:k3s
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           envFrom:
             - configMapRef:
                 name: chess-explainer-config
@@ -42,5 +49,5 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 300m
+              memory: 384Mi
