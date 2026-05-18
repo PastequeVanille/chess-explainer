@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+# Pydantic models define the API contract: what the backend accepts and what it
+# returns. FastAPI uses them both for validation and for API documentation.
 class HealthResponse(BaseModel):
     status: str = "ok"
 
@@ -77,6 +79,8 @@ class PositionStatusResponse(BaseModel):
 
 
 class MoveExplanationRequest(BaseModel):
+    # Regex validation is useful at the API boundary: it rejects obviously
+    # malformed inputs before the service layer starts real chess work.
     fen: str
     from_square: str = Field(pattern=r"^[a-h][1-8]$")
     to_square: str = Field(pattern=r"^[a-h][1-8]$")
@@ -90,6 +94,9 @@ class EngineMoveRequest(BaseModel):
 
 
 class MoveExplanationResponse(BaseModel):
+    # This response is intentionally rich: the frontend receives one structured
+    # payload instead of having to reconstruct the study view from many smaller
+    # calls.
     san: str
     uci: str
     fen_after: str
@@ -154,6 +161,7 @@ class PositionStudyNote(BaseModel):
 
 
 class StudyState(BaseModel):
+    # This model is the persistent "study document" stored on disk as JSON.
     title: str
     move_history_uci: list[str] = Field(default_factory=list)
     current_ply: int = 0

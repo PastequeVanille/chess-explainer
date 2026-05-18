@@ -55,6 +55,10 @@ It will not work with `APE_KEY`.
 4. [04-engine-analysis.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/04-engine-analysis.md)
 5. [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
 6. [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
+7. [07-interview-oral-script.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/07-interview-oral-script.md)
+8. [08-interview-study-sheet.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/08-interview-study-sheet.md)
+9. [09-python-concepts-study-guide.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/09-python-concepts-study-guide.md)
+10. [09-python-concepts-study-guide.pdf](/Users/guillaume/Documents/CODEX/chess-explainer/docs/09-python-concepts-study-guide.pdf)
 
 ## Deploy on AWS
 

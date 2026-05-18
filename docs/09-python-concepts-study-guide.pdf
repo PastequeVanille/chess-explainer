@@ -1,0 +1,1993 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R] /Count 16 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2321 >>
+stream
+BT
+50 782 Td
+/Courier-Bold 18 Tf
+(Python Concepts Study Guide for Chess Study) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(What this guide is for) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This guide explains the main Python concepts used in the project.) Tj
+0 -14 Td
+/Courier 10 Tf
+(The goal is not only to understand syntax, but also to understand why each) Tj
+0 -14 Td
+/Courier 10 Tf
+(concept was useful in a real application.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses Python for:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- backend API routes) Tj
+0 -14 Td
+/Courier 10 Tf
+(- data validation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- chess logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- engine integration) Tj
+0 -14 Td
+/Courier 10 Tf
+(- file persistence) Tj
+0 -14 Td
+/Courier 10 Tf
+(- local authentication) Tj
+0 -14 Td
+/Courier 10 Tf
+(- external HTTP calls) Tj
+0 -14 Td
+/Courier 10 Tf
+(- AI integration) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(1. Project architecture in Python) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The backend follows a simple layered design:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `main.py`: HTTP entry points with FastAPI) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `models.py`: request and response models with Pydantic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `services/*.py`: business logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `config.py`: environment configuration) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is an important concept:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- routes should stay thin) Tj
+0 -14 Td
+/Courier 10 Tf
+(- business rules should live in services) Tj
+0 -14 Td
+/Courier 10 Tf
+(- data structures should be explicit) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That separation makes the code easier to test and easier to resume later.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(2. Imports) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Python uses imports to reuse code from other files and libraries.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples from the project:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `from pathlib import Path`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `from fastapi import FastAPI, HTTPException`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `from .services.chess_service import explain_move`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Concepts to know:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- standard library imports: built into Python) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 2287 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- third-party imports: installed with pip) Tj
+0 -14 Td
+/Courier 10 Tf
+(- local imports: files from your own project) Tj
+0 -14 Td
+/Courier 10 Tf
+(- relative imports: `from .services...`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why it matters:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- imports define dependencies) Tj
+0 -14 Td
+/Courier 10 Tf
+(- they show where the logic comes from) Tj
+0 -14 Td
+/Courier 10 Tf
+(- they help you understand project structure quickly) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(3. Type hints) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses type hints heavily.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `def healthcheck\(\) -> HealthResponse:`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `def legal_targets\(fen: str, from_square_name: str\) -> list[str]:`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `openai_api_key: str | None`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important ideas:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `str`, `int`, `bool` are simple types) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `list[str]` means a list of strings) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `dict[str, str]` means a dictionary with string keys and values) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `str | None` means the value can be a string or missing) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why type hints help:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- make function contracts clearer) Tj
+0 -14 Td
+/Courier 10 Tf
+(- improve editor assistance) Tj
+0 -14 Td
+/Courier 10 Tf
+(- help you reason about data flow) Tj
+0 -14 Td
+/Courier 10 Tf
+(- reduce ambiguity in larger projects) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Type hints do not replace testing, but they make the code easier to read and) Tj
+0 -14 Td
+/Courier 10 Tf
+(safer to evolve.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(4. Dataclasses) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses `@dataclass` in several places.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Example ideas:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `Settings`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `EngineMoveAnalysis`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `EngineReply`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `AuthUser`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(A dataclass is a concise way to define a small class that mostly stores data.) Tj
+0 -14 Td
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 2149 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(Why it is useful:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- less boilerplate than writing a full class manually) Tj
+0 -14 Td
+/Courier 10 Tf
+(- good for structured internal objects) Tj
+0 -14 Td
+/Courier 10 Tf
+(- makes return values more explicit than raw dictionaries) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project often uses:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `@dataclass\(frozen=True\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(`frozen=True` means the object should be treated as immutable.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That is useful for:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- configuration) Tj
+0 -14 Td
+/Courier 10 Tf
+(- analysis results) Tj
+0 -14 Td
+/Courier 10 Tf
+(- small value objects) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(5. Pydantic models) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses Pydantic through `BaseModel`.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `MoveExplanationRequest`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `MoveExplanationResponse`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `AuthLoginRequest`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `StudyResponse`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Pydantic models are very important in FastAPI projects.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(They do several jobs:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- validate incoming data) Tj
+0 -14 Td
+/Courier 10 Tf
+(- define outgoing API structure) Tj
+0 -14 Td
+/Courier 10 Tf
+(- document the API automatically) Tj
+0 -14 Td
+/Courier 10 Tf
+(- provide defaults) Tj
+0 -14 Td
+/Courier 10 Tf
+(- enforce patterns) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Example ideas used in the project:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `Field\(default_factory=list\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `Field\(pattern=r"^[a-h][1-8]$"\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why that is good:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- the API rejects invalid input early) Tj
+0 -14 Td
+/Courier 10 Tf
+(- the frontend and backend share a clear contract) Tj
+0 -14 Td
+/Courier 10 Tf
+(- bugs caused by malformed input are reduced) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Use this mental model:) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 2192 >>
+stream
+BT
+50 782 Td
+0 -14 Td
+/Courier 10 Tf
+(- dataclasses are good for internal Python data) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Pydantic models are especially good for API boundaries) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(6. FastAPI) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(FastAPI is the web framework used in the project.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples from `main.py`:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `app = FastAPI\(title="Chess Study"\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `@app.get\("/api/health"\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `@app.post\("/api/explain-move"\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important concepts:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- route: an HTTP endpoint) Tj
+0 -14 Td
+/Courier 10 Tf
+(- request model: input payload) Tj
+0 -14 Td
+/Courier 10 Tf
+(- response model: output payload) Tj
+0 -14 Td
+/Courier 10 Tf
+(- dependency data: request, response, query params, cookies) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `Request` gives access to cookies and request data) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `Response` lets you set cookies) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `Query\(...\)` defines query parameters) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `HTTPException` returns an HTTP error cleanly) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(FastAPI is powerful because it combines:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- readable route definitions) Tj
+0 -14 Td
+/Courier 10 Tf
+(- type hints) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Pydantic validation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- automatic API documentation) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(7. Functions and separation of responsibility) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project is strongly function-based.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `healthcheck\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `legal_targets\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `build_game_timeline\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `describe_position\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `explain_move\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Good Python design often means:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- small functions) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 2117 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- one clear responsibility per function) Tj
+0 -14 Td
+/Courier 10 Tf
+(- easy reuse) Tj
+0 -14 Td
+/Courier 10 Tf
+(- easy testing) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The most important function in the project is:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `explain_move\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(It acts as an orchestrator:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- validate the move) Tj
+0 -14 Td
+/Courier 10 Tf
+(- update the board) Tj
+0 -14 Td
+/Courier 10 Tf
+(- compute game status) Tj
+0 -14 Td
+/Courier 10 Tf
+(- call engine logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- call opening logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- call AI logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- build the final response) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a good example of backend orchestration in Python.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(8. Pure functions vs side effects) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(A pure function:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- depends only on its inputs) Tj
+0 -14 Td
+/Courier 10 Tf
+(- has no external side effect) Tj
+0 -14 Td
+/Courier 10 Tf
+(- is easier to test) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples close to pure:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `turn_name\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `_headline\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `_white_bar_percentage\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(A side effect means the function changes something outside itself:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- writes a file) Tj
+0 -14 Td
+/Courier 10 Tf
+(- touches a database) Tj
+0 -14 Td
+/Courier 10 Tf
+(- makes an HTTP request) Tj
+0 -14 Td
+/Courier 10 Tf
+(- sets a cookie) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples with side effects:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- file saving in `study_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- SQLite access in `auth_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- HTTP calls in `wikibooks_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- OpenAI calls in `ai_service.py`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This distinction matters a lot for testing and debugging.) Tj
+0 -14 Td
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 2145 >>
+stream
+BT
+50 782 Td
+/Courier-Bold 15 Tf
+(9. Control flow and conditionals) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code uses many `if`, `elif`, and `return` branches.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Example idea:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- if the move is illegal, raise an error) Tj
+0 -14 Td
+/Courier 10 Tf
+(- if the game is checkmate, produce checkmate status) Tj
+0 -14 Td
+/Courier 10 Tf
+(- if Stockfish is unavailable, return a clean fallback) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is not just syntax.) Tj
+0 -14 Td
+/Courier 10 Tf
+(It is decision logic.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(When you study the code, ask:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- what are the branches) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what condition triggers each branch) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what result comes out) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That habit will help you read backend code much faster.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(10. Exceptions and error handling) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code uses `raise ValueError\(...\)` in services.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Then `main.py` catches that and converts it into:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `HTTPException\(status_code=400, detail=...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a very important backend pattern.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The service layer says:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- "this input is invalid") Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The API layer says:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- "turn that into a proper HTTP response") Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project also catches specific external errors in `ai_service.py`:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `AuthenticationError`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `BadRequestError`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `APIConnectionError`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `APITimeoutError`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That is good engineering because:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- it avoids crashing the whole request) Tj
+0 -14 Td
+/Courier 10 Tf
+(- it gives the user a clearer message) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 18 0 R >>
+endobj
+18 0 obj
+<< /Length 2004 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- it creates graceful fallbacks) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(11. Context managers) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses `with ... as ...` in several places.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- SQLite connections) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Stockfish engine startup) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(A context manager helps manage resources safely.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(It ensures proper cleanup when the block ends.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why this matters:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- database connections should be closed) Tj
+0 -14 Td
+/Courier 10 Tf
+(- engine processes should be closed) Tj
+0 -14 Td
+/Courier 10 Tf
+(- temporary resources should not leak) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(You should mentally read:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `with something as x:`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(as:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- "open this resource safely, use it, then clean it up") Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(12. pathlib.Path) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses `Path` from `pathlib` instead of raw string paths.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `PROJECT_ROOT = Path\(__file__\).resolve\(\).parents[2]`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `FRONTEND_DIR = PROJECT_ROOT / "frontend"`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why `Path` is useful:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- cleaner path composition) Tj
+0 -14 Td
+/Courier 10 Tf
+(- more readable than string concatenation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- built-in helpers for reading and writing files) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples of useful methods:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `.resolve\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.parents`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.mkdir\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.read_text\(\)`) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 20 0 R >>
+endobj
+20 0 obj
+<< /Length 1873 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- `.write_text\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a modern Python habit worth learning well.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(13. Environment variables and dotenv) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `.env`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `load_dotenv\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `os.getenv\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That is how configuration is kept outside the code.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `OPENAI_API_KEY`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `OPENAI_MODEL`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `STOCKFISH_PATH`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `WIKIBOOKS_USER_AGENT`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why this is important:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- secrets do not belong in source code) Tj
+0 -14 Td
+/Courier 10 Tf
+(- different environments need different settings) Tj
+0 -14 Td
+/Courier 10 Tf
+(- local, test, and cloud environments often differ) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is one of the most important practical Python deployment concepts.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(14. Dictionaries, lists, tuples, and sets) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses all of them.) Tj
+0 -14 Td
+0 -17 Td
+/Courier-Bold 12 Tf
+(Lists) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Used for ordered collections.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- move history) Tj
+0 -14 Td
+/Courier 10 Tf
+(- bullet points) Tj
+0 -14 Td
+/Courier 10 Tf
+(- candidate moves) Tj
+0 -14 Td
+0 -17 Td
+/Courier-Bold 12 Tf
+(Dictionaries) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Used for key-value mappings.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- response payloads) Tj
+ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 22 0 R >>
+endobj
+22 0 obj
+<< /Length 1856 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- notes by ply) Tj
+0 -14 Td
+/Courier 10 Tf
+(- annotations by ply) Tj
+0 -14 Td
+0 -17 Td
+/Courier-Bold 12 Tf
+(Tuples) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Used for fixed collections, often immutable.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- opening book move sequences) Tj
+0 -14 Td
+/Courier 10 Tf
+(- return values like `\(user, session_token\)`) Tj
+0 -14 Td
+0 -17 Td
+/Courier-Bold 12 Tf
+(Sets) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Used for fast membership checks.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Example:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `CENTER_SQUARES`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Choosing the right collection type is a basic but important Python skill.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(15. String handling) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code uses Python strings in many practical ways.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- f-strings: `f"Move played: {san}"`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- normalization: `email.strip\(\).lower\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- regex validation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- joining text blocks) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(You should be comfortable with:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `.strip\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.lower\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.split\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `.join\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- f-strings) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(These are everywhere in real Python code.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(16. Regular expressions) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code uses regex mainly for validation and parsing.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `Field\(pattern=...\)`) Tj
+ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 24 0 R >>
+endobj
+24 0 obj
+<< /Length 2109 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- splitting response text) Tj
+0 -14 Td
+/Courier 10 Tf
+(- parsing text blocks) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Regex should not scare you.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(What matters most here is:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- they define acceptable input structure) Tj
+0 -14 Td
+/Courier 10 Tf
+(- they help extract or split text patterns) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(17. JSON) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The study system stores data in JSON files.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Concepts used:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `json.loads\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- model serialization) Tj
+0 -14 Td
+/Courier 10 Tf
+(- writing structured text to disk) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why JSON was a good choice here:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- simple) Tj
+0 -14 Td
+/Courier 10 Tf
+(- readable) Tj
+0 -14 Td
+/Courier 10 Tf
+(- enough for a personal study app) Tj
+0 -14 Td
+/Courier 10 Tf
+(- easy to inspect manually) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a good example of choosing a lightweight persistence layer instead of a) Tj
+0 -14 Td
+/Courier 10 Tf
+(heavy database when the project does not need one yet.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(18. SQLite) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses SQLite for local authentication.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important concepts:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- file-based relational database) Tj
+0 -14 Td
+/Courier 10 Tf
+(- SQL queries from Python) Tj
+0 -14 Td
+/Courier 10 Tf
+(- connection object) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `sqlite3.Row` for dictionary-like row access) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why SQLite is useful:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- no separate database server needed) Tj
+0 -14 Td
+/Courier 10 Tf
+(- good for local demos and prototypes) Tj
+0 -14 Td
+/Courier 10 Tf
+(- simple deployment) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a practical backend choice, not a toy concept.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(19. Security-related Python concepts) Tj
+ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 26 0 R >>
+endobj
+26 0 obj
+<< /Length 1941 >>
+stream
+BT
+50 782 Td
+0 -14 Td
+/Courier 10 Tf
+(The auth service uses several good security ideas:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `os.urandom\(...\)` for salt generation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `hashlib.pbkdf2_hmac\(...\)` for password hashing) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `hmac.compare_digest\(...\)` for safe hash comparison) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `token_urlsafe\(...\)` for session tokens) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important lesson:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- never store raw passwords) Tj
+0 -14 Td
+/Courier 10 Tf
+(- never compare secrets with naive string comparison) Tj
+0 -14 Td
+/Courier 10 Tf
+(- always separate salt and hash logic clearly) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Even in a demo project, these habits matter.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(20. datetime and UTC) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code uses:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `datetime`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `UTC`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `timedelta`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- created timestamps) Tj
+0 -14 Td
+/Courier 10 Tf
+(- updated timestamps) Tj
+0 -14 Td
+/Courier 10 Tf
+(- session expiration) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why UTC matters:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- avoids timezone confusion) Tj
+0 -14 Td
+/Courier 10 Tf
+(- is the normal backend default) Tj
+0 -14 Td
+/Courier 10 Tf
+(- makes storage more consistent) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a strong professional habit.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(21. UUIDs) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses `uuid4\(\)` for unique identifiers.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Examples:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- user IDs) Tj
+0 -14 Td
+/Courier 10 Tf
+(- study IDs) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why use UUIDs:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- easy to generate) Tj
+ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 28 0 R >>
+endobj
+28 0 obj
+<< /Length 2067 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- unique enough for practical application use) Tj
+0 -14 Td
+/Courier 10 Tf
+(- useful when you do not want sequential numeric IDs) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(22. HTTP calls with httpx) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The Wikibooks service uses `httpx`.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important concepts:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- HTTP client) Tj
+0 -14 Td
+/Courier 10 Tf
+(- timeouts) Tj
+0 -14 Td
+/Courier 10 Tf
+(- request headers) Tj
+0 -14 Td
+/Courier 10 Tf
+(- query parameters) Tj
+0 -14 Td
+/Courier 10 Tf
+(- error handling) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Why the service is written carefully:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- websites can reject weak requests) Tj
+0 -14 Td
+/Courier 10 Tf
+(- network calls can fail) Tj
+0 -14 Td
+/Courier 10 Tf
+(- data can be missing) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The code therefore:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- sets a user agent) Tj
+0 -14 Td
+/Courier 10 Tf
+(- handles exceptions) Tj
+0 -14 Td
+/Courier 10 Tf
+(- falls back to local opening data) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That is a very good pattern to learn.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(23. HTML parsing with BeautifulSoup) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses BeautifulSoup to extract useful text from Wikibooks HTML.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The main concept:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- parse a page) Tj
+0 -14 Td
+/Courier 10 Tf
+(- locate relevant tags) Tj
+0 -14 Td
+/Courier 10 Tf
+(- clean the text) Tj
+0 -14 Td
+/Courier 10 Tf
+(- ignore noise) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a real-world Python skill:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- external data is rarely returned in exactly the format you want) Tj
+0 -14 Td
+/Courier 10 Tf
+(- parsing and cleaning are common tasks) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(24. python-chess) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is one of the most important libraries in the project.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Core objects and ideas:) Tj
+ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 30 0 R >>
+endobj
+30 0 obj
+<< /Length 2094 >>
+stream
+BT
+50 782 Td
+0 -14 Td
+/Courier 10 Tf
+(- `chess.Board\(\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `chess.Move`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- legal move generation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- SAN) Tj
+0 -14 Td
+/Courier 10 Tf
+(- UCI) Tj
+0 -14 Td
+/Courier 10 Tf
+(- FEN) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Definitions:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- FEN: full board position string) Tj
+0 -14 Td
+/Courier 10 Tf
+(- UCI: move notation like `e2e4`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- SAN: human notation like `Nf3` or `Qxf7#`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(What the library gives you:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- legal move checking) Tj
+0 -14 Td
+/Courier 10 Tf
+(- board updates) Tj
+0 -14 Td
+/Courier 10 Tf
+(- check, mate, stalemate detection) Tj
+0 -14 Td
+/Courier 10 Tf
+(- move notation conversion) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a great example of using a domain library instead of rebuilding complex) Tj
+0 -14 Td
+/Courier 10 Tf
+(logic yourself.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(25. Stockfish integration) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The engine integration uses:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- `chess.engine.SimpleEngine.popen_uci\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `engine.analyse\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(- `engine.play\(...\)`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important Python ideas here:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- wrapping an external process) Tj
+0 -14 Td
+/Courier 10 Tf
+(- handling missing binaries) Tj
+0 -14 Td
+/Courier 10 Tf
+(- converting raw scores into user-facing meaning) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project does not return raw engine output directly.) Tj
+0 -14 Td
+/Courier 10 Tf
+(It transforms it into:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- best move) Tj
+0 -14 Td
+/Courier 10 Tf
+(- candidate moves) Tj
+0 -14 Td
+/Courier 10 Tf
+(- evaluation text) Tj
+0 -14 Td
+/Courier 10 Tf
+(- move quality labels) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(That transformation layer is where real product logic happens.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(26. OpenAI integration) Tj
+0 -14 Td
+ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 32 0 R >>
+endobj
+32 0 obj
+<< /Length 2278 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(The AI service uses the OpenAI Python SDK.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Important concepts:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- build a client only if the API key exists) Tj
+0 -14 Td
+/Courier 10 Tf
+(- send structured prompt input) Tj
+0 -14 Td
+/Courier 10 Tf
+(- parse structured output) Tj
+0 -14 Td
+/Courier 10 Tf
+(- catch provider-specific exceptions) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(This is a strong pattern:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- optional external integration) Tj
+0 -14 Td
+/Courier 10 Tf
+(- clean fallback if unavailable) Tj
+0 -14 Td
+/Courier 10 Tf
+(- no full app crash when the provider fails) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(27. Testing with pytest) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The project uses `pytest`.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Testing matters because this project has many moving parts:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- chess logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- HTTP endpoints) Tj
+0 -14 Td
+/Courier 10 Tf
+(- local persistence) Tj
+0 -14 Td
+/Courier 10 Tf
+(- external integrations) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Even if not everything is tested, having tests means:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- easier refactoring) Tj
+0 -14 Td
+/Courier 10 Tf
+(- lower regression risk) Tj
+0 -14 Td
+/Courier 10 Tf
+(- more confidence in deployment changes) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(You do not need to know advanced pytest features first.) Tj
+0 -14 Td
+/Courier 10 Tf
+(Start by understanding:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- what each test checks) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what input it gives) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what result it expects) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(28. Reading flow of the most important endpoint) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The best study exercise is to trace `/api/explain-move`.) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(The flow is:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(1. FastAPI route receives a `MoveExplanationRequest`) Tj
+0 -14 Td
+/Courier 10 Tf
+(2. `main.py` calls `explain_move\(...\)`) Tj
+0 -14 Td
+/Courier 10 Tf
+(3. `explain_move\(...\)` rebuilds the board from FEN) Tj
+0 -14 Td
+/Courier 10 Tf
+(4. it checks if the move is legal) Tj
+0 -14 Td
+/Courier 10 Tf
+(5. it pushes the move) Tj
+ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 34 0 R >>
+endobj
+34 0 obj
+<< /Length 2485 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(6. it computes game status) Tj
+0 -14 Td
+/Courier 10 Tf
+(7. it calls engine analysis) Tj
+0 -14 Td
+/Courier 10 Tf
+(8. it calls opening/Wikibooks logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(9. it optionally calls AI logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(10. it builds one structured response object) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(If you understand this path, you understand the project much better.) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(29. Best way to study this code today) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Use this order:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(1. `config.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(2. `models.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(3. `main.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(4. `chess_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(5. `engine_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(6. `study_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(7. `auth_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(8. `wikibooks_service.py`) Tj
+0 -14 Td
+/Courier 10 Tf
+(9. `ai_service.py`) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(For each file, ask:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- what goes in) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what comes out) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what external dependencies it uses) Tj
+0 -14 Td
+/Courier 10 Tf
+(- whether it is mostly pure logic or side effects) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(30. Questions to ask yourself while reading) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- Why is this a function and not a class?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Why is this a dataclass and not a Pydantic model?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Why is this validation done here and not in the route?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Which part is pure logic?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- Which part touches the outside world?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- What would be easy to test?) Tj
+0 -14 Td
+/Courier 10 Tf
+(- What would be harder to test?) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(31. What to be able to explain aloud) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(By the end of your study, you should be able to explain:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- how FastAPI routes work) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what Pydantic models do) Tj
+0 -14 Td
+/Courier 10 Tf
+(- what dataclasses do) Tj
+0 -14 Td
+/Courier 10 Tf
+(- how the project loads config) Tj
+0 -14 Td
+/Courier 10 Tf
+(- how the board is represented with python-chess) Tj
+0 -14 Td
+/Courier 10 Tf
+(- how Stockfish is called) Tj
+0 -14 Td
+/Courier 10 Tf
+(- how JSON persistence works) Tj
+ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /Courier 3 0 R /Courier-Bold 4 0 R >> >> /Contents 36 0 R >>
+endobj
+36 0 obj
+<< /Length 889 >>
+stream
+BT
+50 782 Td
+/Courier 10 Tf
+(- how SQLite auth works at a high level) Tj
+0 -14 Td
+/Courier 10 Tf
+(- how the app is structured into services) Tj
+0 -14 Td
+0 -21 Td
+/Courier-Bold 15 Tf
+(32. Final advice) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(Do not try to memorize every line.) Tj
+0 -14 Td
+/Courier 10 Tf
+(Instead, learn the patterns:) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(- route layer) Tj
+0 -14 Td
+/Courier 10 Tf
+(- model layer) Tj
+0 -14 Td
+/Courier 10 Tf
+(- service layer) Tj
+0 -14 Td
+/Courier 10 Tf
+(- pure logic) Tj
+0 -14 Td
+/Courier 10 Tf
+(- side effects) Tj
+0 -14 Td
+/Courier 10 Tf
+(- validation) Tj
+0 -14 Td
+/Courier 10 Tf
+(- persistence) Tj
+0 -14 Td
+/Courier 10 Tf
+(- external integration) Tj
+0 -14 Td
+0 -14 Td
+/Courier 10 Tf
+(If you can explain those patterns with examples from your own code, you are) Tj
+0 -14 Td
+/Courier 10 Tf
+(already studying Python in a very strong way.) Tj
+ET
+endstream
+endobj
+xref
+0 37
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000225 00000 n 
+0000000293 00000 n 
+0000000366 00000 n 
+0000000517 00000 n 
+0000002890 00000 n 
+0000003041 00000 n 
+0000005380 00000 n 
+0000005532 00000 n 
+0000007734 00000 n 
+0000007887 00000 n 
+0000010132 00000 n 
+0000010285 00000 n 
+0000012455 00000 n 
+0000012608 00000 n 
+0000014806 00000 n 
+0000014959 00000 n 
+0000017016 00000 n 
+0000017169 00000 n 
+0000019095 00000 n 
+0000019248 00000 n 
+0000021157 00000 n 
+0000021310 00000 n 
+0000023472 00000 n 
+0000023625 00000 n 
+0000025619 00000 n 
+0000025772 00000 n 
+0000027892 00000 n 
+0000028045 00000 n 
+0000030192 00000 n 
+0000030345 00000 n 
+0000032676 00000 n 
+0000032829 00000 n 
+0000035367 00000 n 
+0000035520 00000 n 
+trailer
+<< /Size 37 /Root 1 0 R >>
+startxref
+36461
+%%EOF

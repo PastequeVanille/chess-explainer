@@ -58,6 +58,8 @@ app.add_middleware(
 
 @app.get("/api/health", response_model=HealthResponse)
 def healthcheck() -> HealthResponse:
+    # Keep this endpoint tiny and dependable: it is used by probes and by
+    # deployment checks, so it should do almost no work.
     return HealthResponse()
 
 
@@ -123,6 +125,9 @@ def get_legal_moves(fen: str, from_square: str) -> LegalMovesResponse:
 
 @app.post("/api/explain-move", response_model=MoveExplanationResponse)
 def explain(payload: MoveExplanationRequest) -> MoveExplanationResponse:
+    # The route layer should stay thin. It validates the request through
+    # Pydantic, calls the service, and translates domain errors into HTTP
+    # errors.
     try:
         result = explain_move(
             payload.fen,
@@ -149,6 +154,8 @@ def engine_move(payload: EngineMoveRequest) -> EngineMoveResponse:
 
 @app.get("/api/fen-history")
 def fen_history(move_history_uci: list[str] = Query(default_factory=list)) -> dict[str, list]:
+    # Query(...) is how FastAPI expresses HTTP query parameters while still
+    # keeping type hints and defaults explicit in Python.
     try:
         return build_game_timeline(move_history_uci)
     except ValueError as exc:
@@ -204,6 +211,7 @@ app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
 
 
 def _current_user(request: Request) -> AuthUserResponse | None:
+    # Private helper functions keep repeated route logic small and readable.
     return get_user_for_session(request.cookies.get(SESSION_COOKIE_NAME))
 
 

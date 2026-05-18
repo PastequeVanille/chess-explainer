@@ -15,6 +15,8 @@ STUDY_DIR = PROJECT_ROOT / "data" / "studies"
 
 
 def list_studies(owner_key: str = "guest") -> list[StudySummaryResponse]:
+    # `Path` from pathlib gives a cleaner file API than manual string path
+    # concatenation.
     study_dir = _study_dir(owner_key)
     study_dir.mkdir(parents=True, exist_ok=True)
     studies: list[StudySummaryResponse] = []
@@ -33,6 +35,8 @@ def list_studies(owner_key: str = "guest") -> list[StudySummaryResponse]:
 
 
 def create_study(title: str, owner_key: str = "guest") -> StudyResponse:
+    # UUIDs are convenient identifiers when you want unique IDs without a
+    # central counter.
     now = _now_iso()
     study = StudyResponse(
         id=str(uuid4()),
@@ -57,6 +61,8 @@ def get_study(study_id: str, owner_key: str = "guest") -> StudyResponse:
 
 
 def save_study(study_id: str, payload: StudyUpdateRequest, owner_key: str = "guest") -> StudyResponse:
+    # Read-modify-write is a simple persistence pattern when JSON files are good
+    # enough for the project scale.
     current = get_study(study_id, owner_key)
     updated = StudyResponse(
         id=current.id,
@@ -75,6 +81,8 @@ def save_study(study_id: str, payload: StudyUpdateRequest, owner_key: str = "gue
 
 
 def export_study_markdown(study_id: str, owner_key: str = "guest") -> str:
+    # This function is a good example of transforming structured data into a
+    # human-readable export format.
     study = get_study(study_id, owner_key)
     san_moves = _uci_to_san_moves(study.move_history_uci)
 
@@ -153,6 +161,8 @@ def export_study_markdown(study_id: str, owner_key: str = "guest") -> str:
 def _write_study(study: StudyResponse, owner_key: str) -> None:
     study_dir = _study_dir(owner_key)
     study_dir.mkdir(parents=True, exist_ok=True)
+    # Pydantic can serialize the whole model directly to JSON, which keeps the
+    # persistence code compact.
     _study_path(study.id, owner_key).write_text(study.model_dump_json(indent=2))
 
 

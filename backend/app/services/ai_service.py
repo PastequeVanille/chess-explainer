@@ -9,6 +9,8 @@ from ..config import get_settings
 
 
 class AiMoveExplanation(BaseModel):
+    # Pydantic is used here too, not for an HTTP API this time, but to describe
+    # the structured shape we want back from the model.
     verdict: str
     best_plan: str
     typical_mistake: str
@@ -32,6 +34,7 @@ def generate_ai_explanation(
     if client is None:
         client = _build_client(settings.openai_api_key)
     if client is None:
+        # Graceful degradation: the app still works even when AI is disabled.
         return None
 
     try:
@@ -78,6 +81,8 @@ def generate_ai_explanation(
             "typical_mistake": parsed.typical_mistake,
             "training_takeaway": parsed.training_takeaway,
         }
+    # Catch provider-specific exceptions and convert them into user-facing
+    # messages instead of crashing the whole move explanation flow.
     except AuthenticationError:
         return {"error": "Authentication failed. Check OPENAI_API_KEY."}
     except BadRequestError as exc:

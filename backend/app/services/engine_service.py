@@ -20,6 +20,8 @@ PIECE_VALUES = {
 
 @dataclass(frozen=True)
 class EngineCandidateMove:
+    # Dataclasses are useful for structured internal results that are not API
+    # models. They are lightweight and readable.
     san: str
     uci: str
     score_display: str
@@ -56,7 +58,11 @@ def analyse_move_with_engine(
     board_before: chess.Board,
     move: chess.Move,
 ) -> EngineMoveAnalysis:
+    # Engine integration is split out into its own service so the main chess
+    # service stays focused on orchestration.
     info_before = engine.analyse(board_before, chess.engine.Limit(time=0.15), multipv=3)
+    # Some libraries can return one dict or a list depending on options. This is
+    # a common Python normalization step when working with external APIs.
     if isinstance(info_before, dict):
         info_before = [info_before]
 
@@ -150,6 +156,8 @@ def _centipawn_loss(turn: bool, best_score_cp: int, played_score_cp: int) -> int
 
 
 def _classify_move(centipawn_loss: int, is_best_move: bool, is_interesting: bool) -> tuple[str, str]:
+    # Domain logic often becomes cleaner when converted into small helper
+    # functions with explicit inputs and outputs.
     if is_best_move:
         return "best", "Best move"
     if is_interesting and centipawn_loss <= 80:
@@ -185,6 +193,8 @@ def _build_quality_summary(
 
 
 def _white_bar_percentage(score_cp: int) -> int:
+    # Convert an engine score into a UI-friendly 0-100 scale for the evaluation
+    # bar. This is a pure transformation function.
     clipped = max(-1200, min(1200, score_cp))
     return int(round(((clipped + 1200) / 2400) * 100))
 

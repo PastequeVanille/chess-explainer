@@ -30,6 +30,7 @@ PIECE_VALUES = {
 
 
 def initial_game_state() -> dict[str, str | int]:
+    # A small pure function: same input state every time, no side effects.
     board = chess.Board()
     return {
         "fen": board.fen(),
@@ -39,6 +40,9 @@ def initial_game_state() -> dict[str, str | int]:
 
 
 def legal_targets(fen: str, from_square_name: str) -> list[str]:
+    # Rebuild board state from FEN. This is a common backend pattern: the
+    # frontend sends serialized state, and the backend turns it back into a
+    # domain object.
     board = chess.Board(fen)
     from_square = chess.parse_square(from_square_name)
     piece = board.piece_at(from_square)
@@ -65,6 +69,8 @@ def build_fen_history(move_history_uci: list[str]) -> list[str]:
 
 
 def build_game_timeline(move_history_uci: list[str]) -> dict[str, list]:
+    # This function rebuilds history from move notation instead of storing many
+    # duplicated board states by hand.
     board = chess.Board()
     history = [board.fen()]
     san_history: list[str] = []
@@ -87,6 +93,8 @@ def build_game_timeline(move_history_uci: list[str]) -> dict[str, list]:
 
 
 def describe_position(fen: str) -> dict[str, str | bool | None]:
+    # Centralize game-status logic in one function so every caller gets the same
+    # vocabulary for check, mate, stalemate, and normal play.
     board = chess.Board(fen)
     result = board.result(claim_draw=True) if board.is_game_over(claim_draw=True) else None
 
@@ -163,6 +171,9 @@ def explain_move(
     promotion: str | None = None,
     move_history_uci: list[str] | None = None,
 ) -> dict[str, str | int | list | dict | None]:
+    # This is the main orchestration function of the project. It is a good
+    # example of service-layer code: validate inputs, update domain state,
+    # delegate specialized tasks, then assemble one response payload.
     board_before = chess.Board(fen)
     move = chess.Move.from_uci(f"{from_square_name}{to_square_name}{promotion or ''}")
 
@@ -175,6 +186,8 @@ def explain_move(
     bullets = _build_bullets(board_before, move, moving_piece, captured_piece)
 
     board_after = board_before.copy(stack=True)
+    # Work on a copied board so the "before" state remains available for engine
+    # comparison and explanation building.
     board_after.push(move)
     game_status = describe_position(board_after.fen())
     if game_status["is_checkmate"]:
@@ -308,6 +321,8 @@ def compute_engine_move(
     if board.is_game_over():
         raise ValueError("The game is already over.")
 
+    # `with ... as ...` is a context manager. It ensures the external Stockfish
+    # process is closed properly even if something goes wrong.
     with suppress(FileNotFoundError, chess.engine.EngineError):
         with chess.engine.SimpleEngine.popen_uci(stockfish_path) as engine:
             reply = choose_engine_reply(engine, board)
@@ -325,6 +340,8 @@ def compute_engine_move(
 
 
 def turn_name(turn: bool) -> str:
+    # python-chess uses booleans for side-to-move; this helper turns that into
+    # application-level wording.
     return "white" if turn == chess.WHITE else "black"
 
 

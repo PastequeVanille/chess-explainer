@@ -29,11 +29,15 @@ class AuthUser:
 
 
 def register_user(email: str, password: str, display_name: str) -> tuple[AuthUserResponse, str]:
+    # Normalize user input early so the rest of the flow works with one
+    # canonical representation.
     normalized_email = _normalize_email(email)
     clean_name = display_name.strip()
     if len(clean_name) < 2:
         raise ValueError("Display name must be at least 2 characters.")
 
+    # SQLite is enough here because the project needs a lightweight local auth
+    # store, not a separate database server.
     with _connect() as connection:
         existing = connection.execute(
             "SELECT id FROM users WHERE email = ?",
@@ -76,6 +80,8 @@ def login_user(email: str, password: str) -> tuple[AuthUserResponse, str]:
         expected_hash = row["password_hash"]
         salt = _decode_bytes(row["password_salt"])
         provided_hash = _hash_password(password, salt)
+        # compare_digest is preferred for secrets because it avoids naive string
+        # comparison patterns.
         if not hmac.compare_digest(provided_hash, expected_hash):
             raise ValueError("Invalid email or password.")
 
@@ -180,6 +186,8 @@ def _normalize_email(email: str) -> str:
 
 
 def _hash_password(password: str, salt: bytes) -> str:
+    # Never store raw passwords. PBKDF2 is a standard password hashing approach
+    # for simple applications.
     derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 150_000)
     return _encode_bytes(derived)
 
