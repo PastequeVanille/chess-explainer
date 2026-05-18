@@ -175,6 +175,17 @@ OPENING_BOOK: tuple[LocalOpeningInfo, ...] = (
         ),
         common_responses=("...Bc5", "...Nf6", "...Be7"),
     ),
+    LocalOpeningInfo(
+        moves=("e2e4", "e7e5", "g1f3", "b8c6", "c2c3"),
+        name="Ponziani Opening",
+        eco="C44",
+        parent="Open Game",
+        summary=(
+            "The Ponziani prepares d4 and supports a broad central setup. "
+            "White accepts a slower bishop development in exchange for quick central expansion and flexible play."
+        ),
+        common_responses=("...Nf6", "...d5", "...f5"),
+    ),
 )
 
 

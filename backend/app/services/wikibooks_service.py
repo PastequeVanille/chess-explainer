@@ -31,9 +31,8 @@ def fetch_opening_explanation(
     current_move_uci: str,
     client: httpx.Client | None = None,
 ) -> WikibooksExplanation | None:
-    if not is_opening_sequence(move_history_uci, current_move_uci):
-        return None
-
+    # This service is intentionally defensive: external HTTP sources can fail,
+    # change shape, or be incomplete, so we keep local fallbacks.
     san_moves = _uci_history_to_san_history(move_history_uci, current_move_uci)
     if not san_moves:
         return None
@@ -43,6 +42,9 @@ def fetch_opening_explanation(
         return None
 
     local_opening = lookup_opening(move_history_uci, current_move_uci)
+    local_opening_is_active = (
+        local_opening is not None and is_opening_sequence(move_history_uci, current_move_uci)
+    )
 
     settings = get_settings()
     headers = {
@@ -51,6 +53,8 @@ def fetch_opening_explanation(
         "Accept-Language": "en-US,en;q=0.9",
     }
     should_close = client is None
+    # HTTP clients are side-effect boundaries. Timeouts and headers matter a lot
+    # when scraping or consuming public web pages reliably.
     client = client or httpx.Client(timeout=8.0, follow_redirects=True, headers=headers)
     url = f"{WIKIBOOKS_PAGE_BASE}{quote(title.replace(' ', '_'), safe='/._')}"
     try:
@@ -60,7 +64,7 @@ def fetch_opening_explanation(
             html = _fetch_page_html(client, url)
             summary = _extract_summary_from_html(html)
     except (httpx.HTTPError, KeyError, TypeError, ValueError):
-        if local_opening is None:
+        if not local_opening_is_active or local_opening is None:
             return None
         return WikibooksExplanation(
             title=title,
@@ -75,7 +79,7 @@ def fetch_opening_explanation(
         if should_close:
             client.close()
 
-    if not summary and local_opening is None:
+    if not summary and (not local_opening_is_active or local_opening is None):
         return None
 
     opening_info = _extract_opening_info_from_html(html)
@@ -86,7 +90,7 @@ def fetch_opening_explanation(
     return WikibooksExplanation(
         title=title,
         url=url,
-        summary=summary or local_opening.summary,
+        summary=summary or (None if local_opening is None else local_opening.summary),
         opening_name=opening_info["opening_name"] or (None if local_opening is None else local_opening.name),
         eco=opening_info["eco"] or (None if local_opening is None else local_opening.eco),
         parent=opening_info["parent"] or (None if local_opening is None else local_opening.parent),
@@ -152,6 +156,8 @@ def _fetch_parsed_html(client: httpx.Client, title: str) -> str:
 
 
 def _extract_summary_from_html(html: str) -> str | None:
+    # BeautifulSoup turns raw HTML into a tree so Python code can navigate tags
+    # instead of doing brittle string slicing.
     soup = BeautifulSoup(html, "html.parser")
     content = soup.find("div", class_="mw-parser-output")
     if content is None:

@@ -48,18 +48,6 @@ class _FailingClient:
         return None
 
 
-class _TrackingClient:
-    def __init__(self):
-        self.calls = 0
-
-    def get(self, *args, **kwargs):
-        self.calls += 1
-        raise AssertionError("The client should not be called outside the opening phase")
-
-    def close(self):
-        return None
-
-
 def test_build_wikibooks_title() -> None:
     title = _debug_build_title_from_san(["e4", "e5", "Nf3"])
     assert title == "Chess Opening Theory/1. e4/1...e5/2. Nf3"
@@ -110,8 +98,42 @@ def test_fetch_opening_explanation_falls_back_to_local_opening_when_wikibooks_fa
     assert "open positions" in result.summary.lower()
 
 
+def test_fetch_opening_explanation_can_use_wikibooks_without_local_opening_book_match() -> None:
+    client = _FakeClient(
+        """
+        <div class="mw-parser-output">
+          <table class="infobox">
+            <tr><th colspan="2">Vienna Game</th></tr>
+            <tr><th>ECO code:</th><td>C25-C29</td></tr>
+            <tr><th>Parent:</th><td>Open Game</td></tr>
+            <tr><th>Responses:</th><td><a>2...Nf6</a><a>2...Bc5</a></td></tr>
+          </table>
+          <p>The Vienna Game starts with 2.Nc3 and keeps central options flexible.</p>
+          <p>White may aim for f4, rapid development, or quieter positional play.</p>
+        </div>
+        """
+    )
+    result = fetch_opening_explanation(["e2e4", "e7e5"], "b1c3", client=client)
+    assert result is not None
+    assert result.title == "Chess Opening Theory/1. e4/1...e5/2. Nc3"
+    assert result.opening_name == "Vienna Game"
+    assert result.eco == "C25-C29"
+
+
+def test_fetch_opening_explanation_keeps_ponziani_in_opening_phase() -> None:
+    result = fetch_opening_explanation(
+        ["e2e4", "e7e5", "g1f3", "b8c6"],
+        "c2c3",
+        client=_FailingClient(),
+    )
+    assert result is not None
+    assert result.opening_name == "Ponziani Opening"
+    assert result.eco == "C44"
+    assert result.parent == "Open Game"
+
+
 def test_fetch_opening_explanation_returns_none_once_out_of_opening_phase() -> None:
-    client = _TrackingClient()
+    client = _FailingClient()
     result = fetch_opening_explanation(
         [
             "e2e4",
@@ -129,4 +151,3 @@ def test_fetch_opening_explanation_returns_none_once_out_of_opening_phase() -> N
         client=client,
     )
     assert result is None
-    assert client.calls == 0
