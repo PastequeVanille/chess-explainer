@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+chess
+berserk
+openai
+pygame-ce
+pygame_gui
+lxml
+flask
