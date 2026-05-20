@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import chess
 
-from ..models import StudyResponse, StudySummaryResponse, StudyUpdateRequest
+from ..schemas import StudyResponse, StudySummaryResponse, StudyUpdateRequest
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]

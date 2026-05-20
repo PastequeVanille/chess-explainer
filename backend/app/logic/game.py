@@ -6,9 +6,9 @@ import chess
 import chess.engine
 
 from ..config import get_settings
-from .ai_service import generate_ai_explanation
-from .engine_service import EngineMoveAnalysis, analyse_move_with_engine, choose_engine_reply
-from .wikibooks_service import fetch_opening_explanation
+from .ai_coach import generate_ai_explanation
+from .engine import EngineMoveAnalysis, analyse_move_with_engine, choose_engine_reply
+from .wikibooks_openings import fetch_opening_explanation
 
 
 PIECE_NAMES = {

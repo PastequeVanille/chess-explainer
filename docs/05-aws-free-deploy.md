@@ -133,7 +133,7 @@ That script will:
 
 The project now includes a GitHub Actions workflow:
 
-- [.github/workflows/ci.yml](/Users/guillaume/Documents/CODEX/chess-explainer/.github/workflows/ci.yml)
+- [.github/workflows/ci.yml](/Users/guillaume/Documents/Projects/chess-explainer/.github/workflows/ci.yml)
 
 What it does:
 

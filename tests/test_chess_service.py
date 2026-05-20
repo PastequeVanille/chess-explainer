@@ -1,5 +1,5 @@
-from backend.app.services import chess_service
-from backend.app.services.chess_service import (
+from backend.app.logic import game as game_logic
+from backend.app.logic.game import (
     build_game_timeline,
     describe_position,
     explain_move,
@@ -46,7 +46,7 @@ def test_explain_move_keeps_local_coach_when_ai_fails(monkeypatch) -> None:
     def _fake_ai(**kwargs):
         return {"error": "OpenAI connection failed. Check your internet access."}
 
-    monkeypatch.setattr(chess_service, "generate_ai_explanation", _fake_ai)
+    monkeypatch.setattr(game_logic, "generate_ai_explanation", _fake_ai)
     result = explain_move(fen, "e2", "e4", move_history_uci=[])
 
     assert result["ai_error"] == "OpenAI connection failed. Check your internet access."

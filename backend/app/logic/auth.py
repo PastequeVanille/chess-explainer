@@ -11,7 +11,7 @@ from pathlib import Path
 from secrets import token_urlsafe
 from uuid import uuid4
 
-from ..models import AuthUserResponse
+from ..schemas import AuthUserResponse
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]

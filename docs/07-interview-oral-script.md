@@ -75,8 +75,8 @@ You can say:
 
 > I tried to separate the project into clear responsibilities.
 > The frontend is in a dedicated folder, and the backend contains the API and
-> the Python services.
-> Inside the backend, I separated services such as chess analysis, engine
+> the Python logic modules.
+> Inside the backend, I separated logic modules such as chess analysis, engine
 > integration, opening lookup, Wikibooks retrieval, AI summary generation, and
 > study persistence.
 > This makes the code easier to maintain and easier for another developer to
@@ -166,7 +166,7 @@ You can say:
 > libraries for HTTP calls and HTML parsing.
 >
 > In terms of engineering method, I tried to split the project into clear
-> services and to work iteratively from concrete user-facing behaviors.
+> logic modules and to work iteratively from concrete user-facing behaviors.
 > For example, I fixed issues around move display timing, opening detection, and
 > deployment reliability, then documented the result.
 >

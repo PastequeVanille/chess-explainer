@@ -3,7 +3,7 @@
 ## 1. Activate the Python environment
 
 ```bash
-cd /Users/guillaume/Documents/CODEX/chess-explainer
+cd /Users/guillaume/Documents/Projects/chess-explainer
 source .venv/bin/activate
 ```
 

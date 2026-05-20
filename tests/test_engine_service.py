@@ -1,6 +1,6 @@
 import chess
 
-from backend.app.services.engine_service import analyse_move_with_engine
+from backend.app.logic.engine import analyse_move_with_engine
 
 
 class _FakeEngine:

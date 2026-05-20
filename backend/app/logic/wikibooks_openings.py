@@ -9,7 +9,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 from ..config import get_settings
-from .opening_service import is_opening_sequence, lookup_opening
+from .openings import is_opening_sequence, lookup_opening
 
 WIKIBOOKS_PAGE_BASE = "https://en.wikibooks.org/wiki/"
 WIKIBOOKS_API_URL = "https://en.wikibooks.org/w/api.php"

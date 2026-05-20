@@ -5,8 +5,8 @@
 Read:
 
 - `backend/app/main.py`
-- `backend/app/models.py`
-- `backend/app/services/chess_service.py`
+- `backend/app/schemas.py`
+- `backend/app/logic/game.py`
 
 Questions to ask yourself:
 
@@ -19,7 +19,7 @@ Questions to ask yourself:
 Read:
 
 - `frontend/index.html`
-- `frontend/app.js`
+- `frontend/study.js`
 
 Questions to ask yourself:
 
@@ -31,9 +31,9 @@ Questions to ask yourself:
 
 Read:
 
-- `backend/app/services/wikibooks_service.py`
-- `backend/app/services/engine_service.py`
-- `backend/app/services/ai_service.py`
+- `backend/app/logic/wikibooks_openings.py`
+- `backend/app/logic/engine.py`
+- `backend/app/logic/ai_coach.py`
 
 Key idea:
 
@@ -43,7 +43,7 @@ Key idea:
 
 Read:
 
-- `backend/app/services/study_service.py`
+- `backend/app/logic/studies.py`
 
 Key idea:
 

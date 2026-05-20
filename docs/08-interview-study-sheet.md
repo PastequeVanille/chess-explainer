@@ -52,8 +52,8 @@ Be comfortable explaining:
 ## 4. Good technical points to mention
 
 - separation of frontend and backend
-- Python services with focused responsibilities
-- local fallback behavior when external services fail
+- Python logic modules with focused responsibilities
+- local fallback behavior when external logic modules fail
 - caching and saved study state
 - handling asynchronous-feeling UX even when analysis takes time
 - deployment debugging on a small cloud instance
@@ -81,8 +81,8 @@ Python has a strong ecosystem for APIs, testing, parsing, and chess tooling.
 ### How did you organize your code?
 
 I separated responsibilities by feature and by layer: frontend, backend
-services, tests, docs, and infrastructure.
-Inside the backend I split the logic into smaller services such as chess
+logic modules, tests, docs, and infrastructure.
+Inside the backend I split the logic into smaller logic modules such as chess
 analysis, engine integration, opening lookup, and study persistence.
 
 ### How do you document your work?

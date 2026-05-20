@@ -1,4 +1,4 @@
-from backend.app.services.ai_service import generate_ai_explanation
+from backend.app.logic.ai_coach import generate_ai_explanation
 
 import chess
 

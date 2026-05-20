@@ -40,9 +40,9 @@ Special cases:
 
 ## Where it lives in the code
 
-- engine logic: `backend/app/services/engine_service.py`
-- main move explanation: `backend/app/services/chess_service.py`
-- visual bar and badge: `frontend/app.js`
+- engine logic: `backend/app/logic/engine.py`
+- main move explanation: `backend/app/logic/game.py`
+- visual bar and badge: `frontend/study.js`
 
 ## Why this is useful
 

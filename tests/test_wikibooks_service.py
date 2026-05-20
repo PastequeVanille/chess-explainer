@@ -1,4 +1,4 @@
-from backend.app.services.wikibooks_service import (
+from backend.app.logic.wikibooks_openings import (
     _debug_build_title_from_san,
     _debug_extract_summary_from_html,
     fetch_opening_explanation,

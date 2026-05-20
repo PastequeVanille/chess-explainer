@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from .models import (
+from .schemas import (
     AuthLoginRequest,
     AuthRegisterRequest,
     AuthStatusResponse,
@@ -24,7 +24,7 @@ from .models import (
     StudySummaryResponse,
     StudyUpdateRequest,
 )
-from .services.chess_service import (
+from .logic.game import (
     build_game_timeline,
     compute_engine_move,
     explain_move,
@@ -32,8 +32,8 @@ from .services.chess_service import (
     legal_targets,
 )
 from .config import get_settings
-from .services.study_service import create_study, export_study_markdown, get_study, list_studies, save_study
-from .services.auth_service import (
+from .logic.studies import create_study, export_study_markdown, get_study, list_studies, save_study
+from .logic.auth import (
     SESSION_COOKIE_NAME,
     clear_session,
     get_user_for_session,

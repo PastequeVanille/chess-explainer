@@ -12,17 +12,27 @@ This project is a web-based chess study tool built around Python.
 
 ## Project structure
 
-- `backend/`: API, chess logic, Stockfish integration, Wikibooks integration, study storage
-- `frontend/`: browser-based study interface
+I reorganized the code around names that match how I think about the project:
+
+- `backend/app/main.py`: HTTP entry point
+- `backend/app/schemas.py`: API request and response shapes
+- `backend/app/logic/game.py`: chess rules, move explanation, and timeline rebuilding
+- `backend/app/logic/engine.py`: Stockfish integration
+- `backend/app/logic/openings.py`: local opening reference
+- `backend/app/logic/wikibooks_openings.py`: opening context fetched from Wikibooks
+- `backend/app/logic/studies.py`: study persistence
+- `backend/app/logic/auth.py`: account and session logic
+- `backend/app/logic/ai_coach.py`: optional AI coaching summary
+- `frontend/study.js`: browser-side study workflow
 - `tests/`: automated tests
-- `scripts/`: Python scripts for running and testing locally
-- `infra/`: Docker and Kubernetes deployment files
-- `docs/`: short learning-oriented notes
+- `scripts/`: local utility scripts
+- `infra/`: deployment files
+- `docs/`: project notes and interview preparation
 
 ## Run locally
 
 ```bash
-cd /Users/guillaume/Documents/CODEX/chess-explainer
+cd /Users/guillaume/Documents/Projects/chess-explainer
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -49,16 +59,16 @@ It will not work with `APE_KEY`.
 
 ## Learning path
 
-1. [01-project-map.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/01-project-map.md)
-2. [02-run-locally.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/02-run-locally.md)
-3. [03-learning-path.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/03-learning-path.md)
-4. [04-engine-analysis.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/04-engine-analysis.md)
-5. [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
-6. [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
-7. [07-interview-oral-script.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/07-interview-oral-script.md)
-8. [08-interview-study-sheet.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/08-interview-study-sheet.md)
-9. [09-python-concepts-study-guide.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/09-python-concepts-study-guide.md)
-10. [09-python-concepts-study-guide.pdf](/Users/guillaume/Documents/CODEX/chess-explainer/docs/09-python-concepts-study-guide.pdf)
+1. [01-project-map.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/01-project-map.md)
+2. [02-run-locally.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/02-run-locally.md)
+3. [03-learning-path.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/03-learning-path.md)
+4. [04-engine-analysis.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/04-engine-analysis.md)
+5. [05-aws-free-deploy.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/05-aws-free-deploy.md)
+6. [06-k3s-dynatrace.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/06-k3s-dynatrace.md)
+7. [07-interview-oral-script.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/07-interview-oral-script.md)
+8. [08-interview-study-sheet.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/08-interview-study-sheet.md)
+9. [09-python-concepts-study-guide.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/09-python-concepts-study-guide.md)
+10. [09-python-concepts-study-guide.pdf](/Users/guillaume/Documents/Projects/chess-explainer/docs/09-python-concepts-study-guide.pdf)
 
 ## Deploy on AWS
 
@@ -66,10 +76,10 @@ For a free-friendly demo, the recommended deployment is a single EC2 instance wi
 
 Use:
 
-- [docker-compose.aws.yml](/Users/guillaume/Documents/CODEX/chess-explainer/docker-compose.aws.yml)
-- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/ec2/bootstrap-ubuntu.sh)
-- [deploy-from-github.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/ec2/deploy-from-github.sh)
-- [05-aws-free-deploy.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/05-aws-free-deploy.md)
+- [docker-compose.aws.yml](/Users/guillaume/Documents/Projects/chess-explainer/docker-compose.aws.yml)
+- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/Projects/chess-explainer/infra/aws/ec2/bootstrap-ubuntu.sh)
+- [deploy-from-github.sh](/Users/guillaume/Documents/Projects/chess-explainer/infra/aws/ec2/deploy-from-github.sh)
+- [05-aws-free-deploy.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/05-aws-free-deploy.md)
 
 This is much cheaper and simpler than Amazon EKS for a first public demo.
 
@@ -77,9 +87,9 @@ This is much cheaper and simpler than Amazon EKS for a first public demo.
 
 If you want a real Kubernetes demo without Amazon EKS cost, use:
 
-- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/k3s/bootstrap-ubuntu.sh)
-- [deploy-k3s.sh](/Users/guillaume/Documents/CODEX/chess-explainer/infra/aws/k3s/deploy-k3s.sh)
-- [06-k3s-dynatrace.md](/Users/guillaume/Documents/CODEX/chess-explainer/docs/06-k3s-dynatrace.md)
+- [bootstrap-ubuntu.sh](/Users/guillaume/Documents/Projects/chess-explainer/infra/aws/k3s/bootstrap-ubuntu.sh)
+- [deploy-k3s.sh](/Users/guillaume/Documents/Projects/chess-explainer/infra/aws/k3s/deploy-k3s.sh)
+- [06-k3s-dynatrace.md](/Users/guillaume/Documents/Projects/chess-explainer/docs/06-k3s-dynatrace.md)
 
 For the smallest and most reliable Kubernetes demo on EC2:
 
@@ -92,7 +102,7 @@ For the smallest and most reliable Kubernetes demo on EC2:
 
 The repository now includes a CI workflow:
 
-- [.github/workflows/ci.yml](/Users/guillaume/Documents/CODEX/chess-explainer/.github/workflows/ci.yml)
+- [.github/workflows/ci.yml](/Users/guillaume/Documents/Projects/chess-explainer/.github/workflows/ci.yml)
 
 This gives you a clean story:
 

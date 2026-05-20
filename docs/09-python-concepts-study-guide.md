@@ -22,14 +22,14 @@ The project uses Python for:
 The backend follows a simple layered design:
 
 - `main.py`: HTTP entry points with FastAPI
-- `models.py`: request and response models with Pydantic
-- `services/*.py`: business logic
+- `schemas.py`: request and response models with Pydantic
+- `logic/*.py`: business logic
 - `config.py`: environment configuration
 
 This is an important concept:
 
 - routes should stay thin
-- business rules should live in services
+- business rules should live in logic modules
 - data structures should be explicit
 
 That separation makes the code easier to test and easier to resume later.
@@ -42,14 +42,14 @@ Examples from the project:
 
 - `from pathlib import Path`
 - `from fastapi import FastAPI, HTTPException`
-- `from .services.chess_service import explain_move`
+- `from .logic.game import explain_move`
 
 Concepts to know:
 
 - standard library imports: built into Python
 - third-party imports: installed with pip
 - local imports: files from your own project
-- relative imports: `from .services...`
+- relative imports: `from .logic...`
 
 Why it matters:
 
@@ -241,10 +241,10 @@ A side effect means the function changes something outside itself:
 
 Examples with side effects:
 
-- file saving in `study_service.py`
-- SQLite access in `auth_service.py`
-- HTTP calls in `wikibooks_service.py`
-- OpenAI calls in `ai_service.py`
+- file saving in `studies.py`
+- SQLite access in `auth.py`
+- HTTP calls in `wikibooks_openings.py`
+- OpenAI calls in `ai_coach.py`
 
 This distinction matters a lot for testing and debugging.
 
@@ -271,7 +271,7 @@ That habit will help you read backend code much faster.
 
 ## 10. Exceptions and error handling
 
-The code uses `raise ValueError(...)` in services.
+The code uses `raise ValueError(...)` in logic modules.
 
 Then `main.py` catches that and converts it into:
 
@@ -287,7 +287,7 @@ The API layer says:
 
 - "turn that into a proper HTTP response"
 
-The project also catches specific external errors in `ai_service.py`:
+The project also catches specific external errors in `ai_coach.py`:
 
 - `AuthenticationError`
 - `BadRequestError`
@@ -711,14 +711,14 @@ If you understand this path, you understand the project much better.
 Use this order:
 
 1. `config.py`
-2. `models.py`
+2. `schemas.py`
 3. `main.py`
-4. `chess_service.py`
-5. `engine_service.py`
-6. `study_service.py`
-7. `auth_service.py`
-8. `wikibooks_service.py`
-9. `ai_service.py`
+4. `game.py`
+5. `engine.py`
+6. `studies.py`
+7. `auth.py`
+8. `wikibooks_openings.py`
+9. `ai_coach.py`
 
 For each file, ask:
 
@@ -749,7 +749,7 @@ By the end of your study, you should be able to explain:
 - how Stockfish is called
 - how JSON persistence works
 - how SQLite auth works at a high level
-- how the app is structured into services
+- how the app is structured into logic modules
 
 ## 32. Final advice
 
